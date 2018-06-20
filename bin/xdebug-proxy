@@ -1,0 +1,35 @@
+#!/usr/bin/env php
+<?php
+/**
+ * @author Mougrim <rinat@mougrim.ru>
+ */
+namespace Mougrim\XdebugProxy;
+
+use function file_exists;
+use function fwrite;
+use const PHP_EOL;
+use const STDERR;
+
+$composerInstall = '';
+foreach ([__DIR__ . '/../../../autoload.php', __DIR__ . '/../vendor/autoload.php'] as $file) {
+    if (file_exists($file)) {
+        $composerInstall = $file;
+
+        break;
+    }
+}
+if (!$composerInstall) {
+    fwrite(
+        STDERR,
+        'You need to set up the project dependencies using Composer:' . PHP_EOL . PHP_EOL .
+        '    composer install' . PHP_EOL . PHP_EOL .
+        'You can learn all about Composer on https://getcomposer.org/.' . PHP_EOL
+    );
+    exit(1);
+}
+/** @noinspection PhpIncludeInspection */
+require $composerInstall;
+unset($composerInstall);
+
+(new Runner())
+    ->run();
