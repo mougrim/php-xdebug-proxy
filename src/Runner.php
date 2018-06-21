@@ -14,6 +14,7 @@ use function is_array;
 use function is_dir;
 use function is_file;
 use function is_readable;
+use function realpath;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
@@ -62,14 +63,13 @@ class Runner
     protected function getConfigsPath(array $options): string
     {
         $configPath = $options['configs'] ?? __DIR__.'/../config';
-        if (!is_dir($configPath)) {
-            $this->errorFallback("Wrong config path {$configPath}");
-            $this->end(1);
+        $realConfigPath = realpath($configPath);
+        if (!$realConfigPath || !is_dir($realConfigPath)) {
             throw new RunError("Wrong config path {$configPath}", 1);
         }
-        $this->infoFallback("Using config path {$configPath}");
+        $this->infoFallback("Using config path {$realConfigPath}");
 
-        return $configPath;
+        return $realConfigPath;
     }
 
     protected function getConfig(string $configsPath, Factory $factory): Config
