@@ -25,6 +25,13 @@ class Runner
     {
         try {
             $options = $this->getOptions();
+
+            if (isset($options['help'])) {
+                $this->showHelp();
+
+                return;
+            }
+
             $configsPath = $this->getConfigsPath($options);
 
             $logger = $this->getLogger($configsPath);
@@ -37,17 +44,39 @@ class Runner
             $factory->createProxy($logger, $config, $xmlConverter, $ideHandler, $xdebugHandler)
                 ->run();
         } catch (RunError $error) {
+            $this->errorFallback('');
+            $this->errorFallback('There is error:');
             $this->errorFallback($error->getMessage());
-            $this->end($error->getCode() ?: 1);
+            $this->errorFallback('');
+            $this->showHelp($error->getCode() ?: 1);
         }
+    }
+
+    protected function showHelp($exitCode = 0)
+    {
+        $this->infoFallback('Usage:');
+        $this->infoFallback("  {$this->getScriptName()} [options]");
+        $this->infoFallback('');
+        $this->infoFallback('Mandatory arguments to long options are mandatory for short options too.');
+        $this->infoFallback('Options:');
+        $this->infoFallback('  -h, --help         This help.');
+        $this->infoFallback('  -c, --configs=PATH Path to directory with configs:');
+        $this->infoFallback('                      - config.php: you can customize listen ip and port;');
+        $this->infoFallback('                      - logger.php: you can customize logger, file should return object, which is instanceof \Psr\Log\LoggerInterface;');
+        $this->infoFallback('                      - factory.php: you can customize classes, which is used in proxy, file should return object, which is instanceof \Mougrim\XdebugProxy\Factory\Factory.');
+        $this->infoFallback('');
+        $this->infoFallback('Documentation: <https://github.com/mougrim/php-xdebug-proxy/blob/master/README.md#readme>.');
+        $this->infoFallback('');
+        $this->end($exitCode);
     }
 
     protected function getOptions(): array
     {
         $shortToLongOptions = [
             'c' => 'configs',
+            'h' => 'help',
         ];
-        $rawOptions = getopt('c:', ['configs:']);
+        $rawOptions = getopt('c:h', ['configs:', 'help']);
         $result = [];
         foreach ($shortToLongOptions as $shortOption => $longOption) {
             if (isset($rawOptions[$shortOption])) {
@@ -115,6 +144,11 @@ class Runner
         }
         /** @noinspection PhpIncludeInspection */
         return require $path;
+    }
+
+    public function getScriptName(): string
+    {
+        return $_SERVER['argv'][0] ?? 'xdebug-proxy';
     }
 
     protected function end(int $exitCode)

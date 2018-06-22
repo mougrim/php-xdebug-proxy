@@ -62,7 +62,7 @@ There are 3 files:
 Then change configs and run:
 
 ```bash
-bin/xdebug-proxy --configs /your/custom/path/config
+bin/xdebug-proxy --configs=/your/custom/path/config
 ```
 
 ## Thanks
