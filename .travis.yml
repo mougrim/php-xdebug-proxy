@@ -15,6 +15,14 @@ cache:
     - $HOME/.composer/cache
 
 before_script:
-  - "if [ `php -r 'echo (PHP_VERSION_ID < 70100 ? 0 : 1);'` -eq '1' ]; then echo 'new'; composer install --verbose; else echo 'old'; composer remove --no-update --dev friendsofphp/php-cs-fixer; composer require --verbose --dev 'phpunit/phpunit':'^6'; fi"
+  - "if [ `php -r 'echo (PHP_VERSION_ID < 70100 ? 0 : 1);'` -eq '1' ]; then
+       echo 'new';
+       composer install --verbose;
+     else
+       echo 'old';
+       composer remove --no-update --dev friendsofphp/php-cs-fixer;
+       composer require --no-update --verbose --dev 'phpunit/phpunit':'^6';
+       composer update friendsofphp/php-cs-fixer phpunit/phpunit;
+     fi"
 
 script: vendor/bin/phpunit
