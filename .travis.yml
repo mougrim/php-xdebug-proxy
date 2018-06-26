@@ -23,6 +23,8 @@ before_script:
        composer remove --no-update --dev friendsofphp/php-cs-fixer;
        composer remove --no-update --dev phpro/grumphp;
        composer require --no-update --verbose --dev 'phpunit/phpunit':'^6';
+       cat composer.json
+       composer show --tree;
        composer update friendsofphp/php-cs-fixer phpunit/phpunit;
      fi"
 
