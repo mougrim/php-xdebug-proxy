@@ -20,12 +20,10 @@ before_script:
        composer install --verbose;
      else
        echo 'old';
-       composer remove --no-update --dev friendsofphp/php-cs-fixer;
-       composer remove --no-update --dev phpro/grumphp;
+       composer remove --no-update --verbose --dev friendsofphp/php-cs-fixer;
+       composer remove --no-update --verbose --dev phpro/grumphp;
        composer require --no-update --verbose --dev 'phpunit/phpunit':'^6';
-       cat composer.json;
-       composer show --tree;
-       composer update friendsofphp/php-cs-fixer phpunit/phpunit;
+       composer update --verbose --with-dependencies friendsofphp/php-cs-fixer phpro/grumphp phpunit/phpunit;
      fi"
 
 script: vendor/bin/phpunit
