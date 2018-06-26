@@ -21,6 +21,7 @@ before_script:
      else
        echo 'old';
        composer remove --no-update --dev friendsofphp/php-cs-fixer;
+       composer remove --no-update --dev phpro/grumphp;
        composer require --no-update --verbose --dev 'phpunit/phpunit':'^6';
        composer update friendsofphp/php-cs-fixer phpunit/phpunit;
      fi"
