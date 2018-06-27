@@ -126,7 +126,7 @@ class DomXmlConverterTest extends TestCase
 
         $converter = new DomXmlConverter($this->createFakeLogger());
         $this->expectException(XmlParseException::class);
-        $this->expectExceptionMessage('Xml should be without entity ref nodes');
+        $this->expectExceptionMessageRegExp('/^(?:Xml should be without entity ref nodes|Too many child nodes in document)$/');
         $converter->parse($xml);
     }
 
