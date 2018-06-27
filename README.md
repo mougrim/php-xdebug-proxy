@@ -5,6 +5,7 @@ This is [dbgp](https://xdebug.org/docs-dbgp.php) xdebug proxy.
 [![Latest Stable Version](https://poser.pugx.org/mougrim/php-xdebug-proxy/version)](https://packagist.org/packages/mougrim/php-xdebug-proxy)
 [![Latest Unstable Version](https://poser.pugx.org/mougrim/php-xdebug-proxy/v/unstable)](https://packagist.org/packages/mougrim/php-xdebug-proxy)
 [![License](https://poser.pugx.org/mougrim/php-xdebug-proxy/license)](https://packagist.org/packages/mougrim/php-xdebug-proxy)
+[![Build Status](https://api.travis-ci.org/mougrim/php-xdebug-proxy.png?branch=master)](https://travis-ci.org/mougrim/php-xdebug-proxy)
 
 ## Installation
 
