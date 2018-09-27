@@ -13,4 +13,12 @@ interface CommandToXdebugParser
      * @return array [$command, $arguments]
      */
     public function parseCommand(string $request): array;
+
+    /**
+     * @param string $command
+     * @param array $arguments
+     *
+     * @return string
+     */
+    public function buildCommand(string $command, array $arguments): string;
 }

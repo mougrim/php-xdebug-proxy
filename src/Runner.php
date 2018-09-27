@@ -4,6 +4,8 @@ namespace Mougrim\XdebugProxy;
 
 use Mougrim\XdebugProxy\Config\Config;
 use Mougrim\XdebugProxy\Factory\Factory;
+use Mougrim\XdebugProxy\RequestPreparer\Error as RequestPreparerError;
+use Mougrim\XdebugProxy\RequestPreparer\Exception as RequestPreparerException;
 use Psr\Log\LoggerInterface;
 use const PHP_EOL;
 use const STDERR;
@@ -39,7 +41,18 @@ class Runner
             $factory = $this->getFactory($configsPath);
             $config = $this->getConfig($configsPath, $factory);
             $xmlConverter = $factory->createXmlConverter($logger);
-            $ideHandler = $factory->createIdeHandler($logger, $xmlConverter, $factory->createRequestPreparers());
+            $requestPreparers = [];
+            try {
+                $requestPreparers = $factory->createRequestPreparers($logger);
+            } catch (RequestPreparerException $exception) {
+                $logger->warning("Can't create request preparers: {$exception}");
+            } catch (RequestPreparerError $exception) {
+                $logger->critical("Can't create request preparers: {$exception}");
+                $this->end(1);
+
+                return;
+            }
+            $ideHandler = $factory->createIdeHandler($logger, $xmlConverter, $requestPreparers);
             $xdebugHandler = $factory->createXdebugHandler($logger, $xmlConverter, $ideHandler);
             $factory->createProxy($logger, $config, $xmlConverter, $ideHandler, $xdebugHandler)
                 ->run();
