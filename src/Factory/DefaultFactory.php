@@ -8,7 +8,7 @@ use Mougrim\XdebugProxy\Handler\DefaultXdebugHandler;
 use Mougrim\XdebugProxy\Handler\IdeHandler;
 use Mougrim\XdebugProxy\Handler\XdebugHandler;
 use Mougrim\XdebugProxy\Proxy;
-use Mougrim\XdebugProxy\RequestPreparer;
+use Mougrim\XdebugProxy\RequestPreparer\RequestPreparer;
 use Mougrim\XdebugProxy\Xml\DomXmlConverter;
 use Mougrim\XdebugProxy\Xml\XmlConverter;
 use Psr\Log\LoggerInterface;
@@ -41,9 +41,9 @@ class DefaultFactory implements Factory
     }
 
     /**
-     * @return RequestPreparer[]
+     * {@inheritdoc}
      */
-    public function createRequestPreparers(): array
+    public function createRequestPreparers(LoggerInterface $logger): array
     {
         return [];
     }

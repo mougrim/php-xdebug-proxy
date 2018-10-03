@@ -7,7 +7,9 @@ use Amp\Socket\ClientSocket;
 use Amp\Socket\ConnectException;
 use Amp\Socket\ServerSocket;
 use Generator;
-use Mougrim\XdebugProxy\RequestPreparer;
+use Mougrim\XdebugProxy\RequestPreparer\Error as RequestPreparerError;
+use Mougrim\XdebugProxy\RequestPreparer\Exception as RequestPreparerException;
+use Mougrim\XdebugProxy\RequestPreparer\RequestPreparer;
 use Mougrim\XdebugProxy\Xml\XmlContainer;
 use Mougrim\XdebugProxy\Xml\XmlConverter;
 use Mougrim\XdebugProxy\Xml\XmlDocument;
@@ -21,6 +23,7 @@ use function array_keys;
 use function array_slice;
 use function count;
 use function explode;
+use function get_class;
 use function implode;
 use function preg_match;
 use function strlen;
@@ -293,7 +296,11 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         /** @var ClientSocket $ideSocket */
         $ideSocket = $this->ideSockets->offsetGet($xdebugSocket);
         $context['ide'] = $ideSocket->getRemoteAddress();
-        $this->prepareRequestToIde($xmlRequest, $rawRequest);
+        try {
+            $this->prepareRequestToIde($xmlRequest, $rawRequest, $context);
+        } catch (RequestPreparerError $error) {
+            throw new FromXdebugProcessError("Can't prepare request to ide", $context, $error);
+        }
 
         try {
             $request = $this->xmlConverter->generate($xmlRequest);
@@ -313,10 +320,28 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         $this->logger->notice('[Xdebug][Ide] Request was sent to ide, waiting response.', $context);
     }
 
-    protected function prepareRequestToIde(XmlDocument $xmlRequest, string $rawRequest)
+    /**
+     * @param XmlDocument $xmlRequest
+     * @param string $rawRequest
+     * @param array $context
+     *
+     * @throws RequestPreparerError
+     *
+     * @return void
+     */
+    protected function prepareRequestToIde(XmlDocument $xmlRequest, string $rawRequest, array $context)
     {
         foreach ($this->requestPreparers as $requestPreparer) {
-            $requestPreparer->prepareRequestToIde($xmlRequest, $rawRequest);
+            try {
+                $requestPreparer->prepareRequestToIde($xmlRequest, $rawRequest);
+            } catch (RequestPreparerException $exception) {
+                $this->logger->error(
+                    "Can't prepare request to ide: {$exception}",
+                    $context + [
+                        'preparer' => get_class($requestPreparer),
+                    ]
+                );
+            }
         }
     }
 
@@ -408,7 +433,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                         '[Xdebug][Ide] Prepare ide request',
                         $context + ['request' => $request]
                     );
-                    $request = $this->prepareRequestToXdebug($request);
+                    $request = $this->prepareRequestToXdebug($request, $context);
                     $this->logger->info(
                         '[Xdebug][Ide] Send prepared request to xdebug',
                         $context + ['request' => $request]
@@ -418,6 +443,12 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
             }
         } catch (ClosedException $exception) {
             // skip exception, close other connections below
+        } catch (RequestPreparerError $error) {
+            $this->logger->critical(
+                "Can't prepare request: {$error}",
+                $context
+            );
+            // close other connections below
         }
 
         if ($buffer) {
@@ -436,10 +467,28 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         }
     }
 
-    protected function prepareRequestToXdebug(string $request): string
+    /**
+     * @param string $request
+     * @param array $context
+     *
+     * @throws RequestPreparerError
+     *
+     * @return string prepared request
+     */
+    protected function prepareRequestToXdebug(string $request, array $context): string
     {
         foreach ($this->requestPreparers as $requestPreparer) {
-            $request = $requestPreparer->prepareRequestToXdebug($request, $this);
+            try {
+                $request = $requestPreparer->prepareRequestToXdebug($request, $this);
+            } catch (RequestPreparerException $exception) {
+                $this->logger->error(
+                    "Can't prepare request to xdebug: {$exception}",
+                    $context + [
+                        'preparer' => get_class($requestPreparer),
+                        'request' => $request,
+                    ]
+                );
+            }
         }
 
         return $request;
@@ -451,6 +500,16 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         $arguments = $this->parseArguments($arguments);
 
         return [$command, $arguments];
+    }
+
+    public function buildCommand(string $command, array $arguments): string
+    {
+        $argument_strings = [];
+        foreach ($arguments as $argument => $value) {
+            $argument_strings[] = "{$argument} {$value}";
+        }
+
+        return $command.' '.implode(' ', $argument_strings);
     }
 
     protected function parseArguments(string $arguments): array

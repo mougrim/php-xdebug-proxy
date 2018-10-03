@@ -196,6 +196,50 @@ class DomXmlConverterTest extends TestCase
         static::assertSame($xml, $converter->generate($document));
     }
 
+    public function testXdebugMessage()
+    {
+        $xml = '<?xml version="1.0" encoding="iso-8859-1"?>
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="step_into" transaction_id="8" status="break" reason="ok"><xdebug:message filename="file:///home/mougrim/Private/development/mougrim/php-xdebug-proxy/bin/test.php" lineno="11"></xdebug:message></response>';
+
+        $converter = new DomXmlConverter($this->createFakeLogger());
+        $document = $converter->parse($xml);
+
+        static::assertSame('1.0', $document->getVersion());
+        static::assertSame('iso-8859-1', $document->getEncoding());
+        $root = $document->getRoot();
+
+        static::assertNotEmpty($root);
+        static::assertSame('response', $root->getName());
+        static::assertFalse($root->isContentCdata(), "Content shouldn't be cdata");
+        static::assertEmpty($root->getContent(), "Content: {$root->getContent()}");
+        static::assertSame(
+            [
+                'xmlns:xdebug' => 'http://xdebug.org/dbgp/xdebug',
+                'xmlns' => 'urn:debugger_protocol_v1',
+                'command' => 'step_into',
+                'transaction_id' => '8',
+                'status' => 'break',
+                'reason' => 'ok',
+            ],
+            $root->getAttributes()
+        );
+        static::assertCount(1, $root->getChildren());
+
+        $children = $root->getChildren();
+
+        static::assertSame('xdebug:message', $children[0]->getName());
+        static::assertFalse($children[0]->isContentCdata(), 'Content shouldn\'t be cdata');
+        static::assertEmpty($children[0]->getContent(), "Content: {$children[0]->getContent()}");
+        static::assertSame(
+            [
+                'filename' => 'file:///home/mougrim/Private/development/mougrim/php-xdebug-proxy/bin/test.php',
+                'lineno' => '11',
+            ],
+            $children[0]->getAttributes()
+        );
+        static::assertCount(0, $children[0]->getChildren());
+    }
+
     protected function createFakeLogger(): LoggerInterface
     {
         return (new Logger('fake'))
