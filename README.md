@@ -7,7 +7,7 @@ This is [dbgp](https://xdebug.org/docs-dbgp.php) xdebug proxy.
 [![License](https://poser.pugx.org/mougrim/php-xdebug-proxy/license)](https://packagist.org/packages/mougrim/php-xdebug-proxy)
 [![Build Status](https://api.travis-ci.org/mougrim/php-xdebug-proxy.png?branch=master)](https://travis-ci.org/mougrim/php-xdebug-proxy)
 
-## Installation
+### Installation
 
 This package can be installed as a [Composer](https://getcomposer.org/) project:
 
@@ -30,7 +30,7 @@ composer.phar require amphp/log '^1.0.0'
 ```
 
 
-## Run
+### Run
 
 You can run next command:
 ```bash
@@ -46,7 +46,7 @@ Using config path /path/to/php-xdebug-proxy/config
 
 So by default proxy listens '127.0.0.1:9001' for ide registration connections and '127.0.0.1:9002' for xdebug connections.
 
-## Config
+### Config
 
 If you want customize logger, config you factory, you can use custom config path. You just copy `config` directory to you custom path:
 
@@ -66,6 +66,10 @@ Then change configs and run:
 bin/xdebug-proxy --configs=/your/custom/path/config
 ```
 
-## Thanks
+### Using with soft-mocks
+
+See doc in [soft-mocks](https://github.com/badoo/soft-mocks/#using-with-xdebug) project.
+
+### Thanks
 
 Many thanks to [Eelf](https://github.com/eelf) for proxy example [smdbgpproxy](https://github.com/eelf/smdbgpproxy).
