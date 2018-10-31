@@ -1,8 +1,12 @@
 ## PHP xdebug (dbgp) proxy ChangeLog
 
+## master
+
+There are next changes:
+
 ### v0.1.0
 
-There was next changes:
+There are next changes:
 
 - [soft-mocks](https://github.com/badoo/soft-mocks/#using-with-xdebug) support was added
 - `\Mougrim\XdebugProxy\Handler\CommandToXdebugParser::buildCommand()` method was added
