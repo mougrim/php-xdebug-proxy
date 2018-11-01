@@ -7,6 +7,7 @@ use Amp\Socket\ClientSocket;
 use Amp\Socket\ConnectException;
 use Amp\Socket\ServerSocket;
 use Generator;
+use Mougrim\XdebugProxy\Config\IdeServer as IdeServerConfig;
 use Mougrim\XdebugProxy\RequestPreparer\Error as RequestPreparerError;
 use Mougrim\XdebugProxy\RequestPreparer\Exception as RequestPreparerException;
 use Mougrim\XdebugProxy\RequestPreparer\RequestPreparer;
@@ -59,8 +60,10 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
     ];
 
     protected $logger;
+    protected $config;
     protected $xmlConverter;
     protected $requestPreparers;
+    protected $defaultIde;
     protected $ideList = [];
     /**
      * @var ServerSocket[]|SplObjectStorage
@@ -70,15 +73,25 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
 
     /**
      * @param LoggerInterface $logger
+     * @param IdeServerConfig $config
      * @param XmlConverter $xmlConverter
      * @param RequestPreparer[] $requestPreparers
      */
-    public function __construct(LoggerInterface $logger, XmlConverter $xmlConverter, array $requestPreparers)
+    public function __construct(LoggerInterface $logger, IdeServerConfig $config, XmlConverter $xmlConverter, array $requestPreparers)
     {
         $this->logger = $logger;
+        $this->config = $config;
         $this->xmlConverter = $xmlConverter;
         $this->requestPreparers = $requestPreparers;
         $this->ideSockets = new SplObjectStorage();
+        $this->defaultIde = $config->getDefaultIde();
+        if ($this->defaultIde) {
+            $this->logger->notice("Use default ide: {$this->defaultIde}");
+        }
+        $this->ideList = $config->getPredefinedIdeList();
+        if ($this->ideList) {
+            $this->logger->notice('Use predefined ides', ['predefinedIdeList' => $this->ideList]);
+        }
     }
 
     public function getMaxIdeSockets(): int
@@ -390,7 +403,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
             throw new FromXdebugProcessError('Ide key is empty', $context);
         }
         $context['ideKey'] = $ideKey;
-        $ide = $this->ideList[$ideKey] ?? null;
+        $ide = $this->ideList[$ideKey] ?? $this->defaultIde;
         if (!$ide) {
             throw new FromXdebugProcessException('No any ide', $context);
         }

@@ -56,7 +56,33 @@ cp -r /path/to/php-xdebug-proxy/config /your/custom/path
 
 There are 3 files:
 
-- `config.php`: you can customize listen ip and port;
+- `config.php`:
+    ```php
+    <?php
+    return [
+        'xdebugServer' => [
+            // xdebug proxy server host:port
+            'listen' => '127.0.0.1:9002',
+        ],
+        'ideServer' => [
+            // if proxy can't find ide, then it uses default ide,
+            // pass empty string if you want to disable default ide
+            // defaultIde is useful when there is only one user for proxy
+            'defaultIde' => '127.0.0.1:9000',
+            // predefined ide list in format 'idekey' => 'host:port',
+            // pass empty array if you don't need predefined ide list
+            // predefinedIdeList is useful when proxy's users aren't changed often,
+            // so they don't need to register in proxy each proxy restart
+            'predefinedIdeList' => [
+                'idekey' => '127.0.0.1:9000',
+            ],
+        ],
+        'ideRegistrationServer' => [
+           // host:port for register ide in proxy
+            'listen' => '127.0.0.1:9001',
+        ],
+    ];
+    ```
 - `logger.php`: you can customize logger, file should return object, which is instanceof `\Psr\Log\LoggerInterface`;
 - `factory.php`: you can customize classes, which is used in proxy, file should return object, which is instanceof `\Mougrim\XdebugProxy\Factory\Factory`.
 

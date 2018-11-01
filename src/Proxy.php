@@ -22,7 +22,6 @@ class Proxy
     protected $xmlConverter;
     protected $ideHandler;
     protected $xdebugHandler;
-    protected $ide_list = [];
 
     public function __construct(
         LoggerInterface $logger,

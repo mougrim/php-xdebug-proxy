@@ -52,7 +52,7 @@ class Runner
 
                 return;
             }
-            $ideHandler = $factory->createIdeHandler($logger, $xmlConverter, $requestPreparers);
+            $ideHandler = $factory->createIdeHandler($logger, $config->getIdeServer(), $xmlConverter, $requestPreparers);
             $xdebugHandler = $factory->createXdebugHandler($logger, $xmlConverter, $ideHandler);
             $factory->createProxy($logger, $config, $xmlConverter, $ideHandler, $xdebugHandler)
                 ->run();
