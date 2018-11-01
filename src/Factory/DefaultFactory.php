@@ -3,6 +3,7 @@
 namespace Mougrim\XdebugProxy\Factory;
 
 use Mougrim\XdebugProxy\Config\Config;
+use Mougrim\XdebugProxy\Config\IdeServer as IdeServerConfig;
 use Mougrim\XdebugProxy\Handler\DefaultIdeHandler;
 use Mougrim\XdebugProxy\Handler\DefaultXdebugHandler;
 use Mougrim\XdebugProxy\Handler\IdeHandler;
@@ -30,14 +31,15 @@ class DefaultFactory implements Factory
 
     /**
      * @param LoggerInterface $logger
+     * @param IdeServerConfig $config
      * @param XmlConverter $xmlConverter
      * @param RequestPreparer[] $requestPreparers
      *
      * @return IdeHandler
      */
-    public function createIdeHandler(LoggerInterface $logger, XmlConverter $xmlConverter, array $requestPreparers): IdeHandler
+    public function createIdeHandler(LoggerInterface $logger, IdeServerConfig $config, XmlConverter $xmlConverter, array $requestPreparers): IdeHandler
     {
-        return new DefaultIdeHandler($logger, $xmlConverter, $requestPreparers);
+        return new DefaultIdeHandler($logger, $config, $xmlConverter, $requestPreparers);
     }
 
     /**

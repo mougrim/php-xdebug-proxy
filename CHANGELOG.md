@@ -3,6 +3,8 @@
 ## master
 
 There are next changes:
+- defaultIde config param was added
+- predefinedIdeList config param was added
 
 ### v0.1.0
 

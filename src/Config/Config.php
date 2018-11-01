@@ -15,9 +15,17 @@ class Config
         'listen' => '127.0.0.1:9001',
     ];
 
+    const DEFAULT_IDE_SERVER_CONFIG = [
+        'defaultIde' => '127.0.0.1:9000',
+        'predefinedIdeList' => [
+            'idekey' => '127.0.0.1:9000',
+        ],
+    ];
+
     protected $config;
     protected $xdebugServer;
     protected $ideRegistrationServer;
+    protected $ideServer;
 
     public function __construct(array $config)
     {
@@ -30,6 +38,10 @@ class Config
             $this->config['ideRegistrationServer'] ?? [],
             static::DEFAULT_IDE_REGISTRATION_SERVER_CONFIG
         );
+        $this->ideServer = new IdeServer(
+            $this->config['ideServer'] ?? [],
+            static::DEFAULT_IDE_SERVER_CONFIG
+        );
     }
 
     public function getXdebugServer(): Server
@@ -40,5 +52,10 @@ class Config
     public function getIdeRegistrationServer(): Server
     {
         return $this->ideRegistrationServer;
+    }
+
+    public function getIdeServer(): IdeServer
+    {
+        return $this->ideServer;
     }
 }
