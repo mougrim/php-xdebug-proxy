@@ -330,7 +330,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
             );
         }
 
-        $this->logger->notice('[Xdebug][Ide] Request was sent to ide, waiting response.', $context);
+        $this->logger->debug('[Xdebug][Ide] Request was sent to ide, waiting response.', $context);
     }
 
     /**
@@ -443,11 +443,11 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                 while (strpos($buffer, "\0") !== false) {
                     list($request, $buffer) = explode("\0", $buffer, 2);
                     $this->logger->info(
-                        '[Xdebug][Ide] Prepare ide request',
+                        '[Xdebug][Ide] Process ide request',
                         $context + ['request' => $request]
                     );
                     $request = $this->prepareRequestToXdebug($request, $context);
-                    $this->logger->info(
+                    $this->logger->debug(
                         '[Xdebug][Ide] Send prepared request to xdebug',
                         $context + ['request' => $request]
                     );

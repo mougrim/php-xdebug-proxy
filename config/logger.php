@@ -17,6 +17,6 @@ if (!class_exists(StreamHandler::class)) {
 
 return (new Logger('xdebug-proxy'))
     ->pushHandler(
-        (new StreamHandler(new ResourceOutputStream(STDOUT)))
+        (new StreamHandler(new ResourceOutputStream(STDOUT), Logger::NOTICE))
             ->setFormatter(new LoggerFormatter())
     );

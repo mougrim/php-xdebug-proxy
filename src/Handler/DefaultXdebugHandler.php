@@ -44,7 +44,7 @@ class DefaultXdebugHandler implements XdebugHandler
         $baseContext = [
             'xdebug' => $socket->getRemoteAddress(),
         ];
-        $this->logger->info('[Xdebug] Accepted connection', $baseContext);
+        $this->logger->notice('[Xdebug] Accepted connection', $baseContext);
 
         if (!$this->requestBuffers->contains($socket)) {
             $this->requestBuffers->attach($socket, '');
@@ -57,7 +57,7 @@ class DefaultXdebugHandler implements XdebugHandler
                 try {
                     list($length, $request, $buffer) = explode("\0", $buffer, 3);
                     $context = $baseContext + ['request' => $request, 'requestLength' => $length];
-                    $this->logger->info('Process request', $context);
+                    $this->logger->info('[Xdebug] Process request', $context);
 
                     $requestLength = mb_strlen($request, '8bit');
                     if ((string) $requestLength !== $length) {
