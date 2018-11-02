@@ -5,6 +5,8 @@
 There are next changes:
 - defaultIde config param was added
 - predefinedIdeList config param was added
+- now by default debug and info logs are disabled
+- log levels for some logs are changed
 
 ### v0.1.0
 
