@@ -1,6 +1,6 @@
 ## PHP xdebug (dbgp) proxy
 
-This is expandable [dbgp](https://xdebug.org/docs-dbgp.php) xdebug proxy based on [amphp](https://amphp.org/).
+This is [expandable](#extending) [dbgp](https://xdebug.org/docs-dbgp.php) xdebug proxy based on [amphp](https://amphp.org/).
 
 The idea is described in document [Multi-user debugging in PhpStorm with Xdebug and DBGp proxy](https://confluence.jetbrains.com/display/PhpStorm/Multi-user+debugging+in+PhpStorm+with+Xdebug+and+DBGp+proxy#Multi-userdebugginginPhpStormwithXdebugandDBGpproxy-HowdoesXdebugwork%3F).
 
