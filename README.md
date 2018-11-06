@@ -2,7 +2,7 @@
 
 This is expandable [dbgp](https://xdebug.org/docs-dbgp.php) xdebug proxy based on [amphp](https://amphp.org/).
 
-The idea is described in document [Multi-user debugging in PhpStorm with Xdebug and DBGp proxy](https://confluence.jetbrains.com/display/PhpStorm/Multi-user+debugging+in+PhpStorm+with+Xdebug+and+DBGp+proxy#Multi-userdebugginginPhpStormwithXdebugandDBGpproxy-HowdoesXdebugwork).
+The idea is described in document [Multi-user debugging in PhpStorm with Xdebug and DBGp proxy](https://confluence.jetbrains.com/display/PhpStorm/Multi-user+debugging+in+PhpStorm+with+Xdebug+and+DBGp+proxy#Multi-userdebugginginPhpStormwithXdebugandDBGpproxy-HowdoesXdebugwork%3F).
 
 The benefits are that this proxy is written in php - language, which you know.
 
@@ -88,7 +88,7 @@ There are 3 files:
     ];
     ```
 - [`logger.php`](config/logger.php): you can customize logger, file should return object, which is instanceof `\Psr\Log\LoggerInterface`;
-- <a name="factory-php"></a>[`factory.php`](config/factory.php): you can [customize classes](#extending), which is used in proxy, file should return object, which is instanceof `\Mougrim\XdebugProxy\Factory\Factory`.
+- <a name="factory-php"></a>[`factory.php`](config/factory.php): you can [customize classes](#extending), which is used in proxy, file should return object, which is instanceof [`Factory\Factory`](src/Factory/Factory.php).
 
 Then change configs and run:
 
@@ -98,11 +98,11 @@ bin/xdebug-proxy --configs=/your/custom/path/config
 
 ### Extending
 
-As mentioned [above](#factory-php) you can customize classes using your custom factory, which implements [`\Mougrim\XdebugProxy\Factory\Factory`](src/Factory/Factory.php). By default [`\Mougrim\XdebugProxy\Factory\DefaultFactory`](src/Factory/DefaultFactory.php) factory is used.
+As mentioned [above](#factory-php) you can customize classes using your custom factory, which implements [`Factory\Factory`](src/Factory/Factory.php). By default [`Factory\DefaultFactory`](src/Factory/DefaultFactory.php) factory is used.
 
-The most helpful are request preparers. You can redeclare `\Mougrim\XdebugProxy\Factory\DefaultFactory::createRequestPreparers()` - return array of objects. Their classes should implement [`\Mougrim\XdebugProxy\RequestPreparer\RequestPreparer`](src/RequestPreparer/RequestPreparer.php).
+The most helpful are request preparers. You can redeclare `Factory\DefaultFactory::createRequestPreparers()`. It should return array of objects. Their classes should implement [`RequestPreparer\RequestPreparer`](src/RequestPreparer/RequestPreparer.php).
 
-Good example of request preparer is [`\Mougrim\XdebugProxy\RequestPreparer\SoftMocksRequestPreparer`](src/RequestPreparer/SoftMocksRequestPreparer.php) and [`\Mougrim\XdebugProxy\Factory\SoftMocksFactory`](src/Factory/SoftMocksFactory.php).
+Good example of request preparer is [`RequestPreparer\SoftMocksRequestPreparer`](src/RequestPreparer/SoftMocksRequestPreparer.php) and [`Factory\SoftMocksFactory`](src/Factory/SoftMocksFactory.php).
 
 ### Using with soft-mocks
 
