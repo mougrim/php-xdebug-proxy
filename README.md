@@ -2,6 +2,10 @@
 
 This is [dbgp](https://xdebug.org/docs-dbgp.php) xdebug proxy.
 
+The idea is described in document [Multi-user debugging in PhpStorm with Xdebug and DBGp proxy](https://confluence.jetbrains.com/display/PhpStorm/Multi-user+debugging+in+PhpStorm+with+Xdebug+and+DBGp+proxy#Multi-userdebugginginPhpStormwithXdebugandDBGpproxy-HowdoesXdebugwork).
+
+The benefits are that this proxy is written in php - language, which you know.
+
 [![Latest Stable Version](https://poser.pugx.org/mougrim/php-xdebug-proxy/version)](https://packagist.org/packages/mougrim/php-xdebug-proxy)
 [![Latest Unstable Version](https://poser.pugx.org/mougrim/php-xdebug-proxy/v/unstable)](https://packagist.org/packages/mougrim/php-xdebug-proxy)
 [![License](https://poser.pugx.org/mougrim/php-xdebug-proxy/license)](https://packagist.org/packages/mougrim/php-xdebug-proxy)
