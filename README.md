@@ -2,9 +2,9 @@
 
 This is [expandable](#extending) [dbgp](https://xdebug.org/docs-dbgp.php) xdebug proxy based on [amphp](https://amphp.org/).
 
-The idea is described in document [Multi-user debugging in PhpStorm with Xdebug and DBGp proxy](https://confluence.jetbrains.com/display/PhpStorm/Multi-user+debugging+in+PhpStorm+with+Xdebug+and+DBGp+proxy#Multi-userdebugginginPhpStormwithXdebugandDBGpproxy-HowdoesXdebugwork%3F).
+The idea is described in the document [Multi-user debugging in PhpStorm with Xdebug and DBGp proxy](https://confluence.jetbrains.com/display/PhpStorm/Multi-user+debugging+in+PhpStorm+with+Xdebug+and+DBGp+proxy#Multi-userdebugginginPhpStormwithXdebugandDBGpproxy-HowdoesXdebugwork%3F).
 
-The benefits are that this proxy is written in php - language, which you know.
+The main benefit is that this proxy is written in php - the language you know.
 
 [![Latest Stable Version](https://poser.pugx.org/mougrim/php-xdebug-proxy/version)](https://packagist.org/packages/mougrim/php-xdebug-proxy)
 [![Latest Unstable Version](https://poser.pugx.org/mougrim/php-xdebug-proxy/v/unstable)](https://packagist.org/packages/mougrim/php-xdebug-proxy)
@@ -52,7 +52,7 @@ So by default proxy listens '127.0.0.1:9001' for ide registration connections an
 
 ### Config
 
-If you want customize logger, config you factory, you can use custom config path. You just copy [`config`](config) directory to you custom path:
+If you want to customize a logger, to configure your factory or logger, you can use custom config path. Just copy [`config`](config) directory to your custom path:
 
 ```bash
 cp -r /path/to/php-xdebug-proxy/config /your/custom/path
@@ -87,8 +87,8 @@ There are 3 files:
         ],
     ];
     ```
-- [`logger.php`](config/logger.php): you can customize logger, file should return object, which is instanceof `\Psr\Log\LoggerInterface`;
-- <a name="factory-php"></a>[`factory.php`](config/factory.php): you can [customize classes](#extending), which is used in proxy, file should return object, which is instanceof [`Factory\Factory`](src/Factory/Factory.php).
+- [`logger.php`](config/logger.php): you can customize a logger, the file should return an object, which is instance of `\Psr\Log\LoggerInterface`;
+- <a name="factory-php"></a>[`factory.php`](config/factory.php): you can [customize classes](#extending), which are used in proxy, file should return object, which is instanceof [`Factory\Factory`](src/Factory/Factory.php).
 
 Then change configs and run:
 
@@ -100,9 +100,11 @@ bin/xdebug-proxy --configs=/your/custom/path/config
 
 As mentioned [above](#factory-php) you can customize classes using your custom factory, which implements [`Factory\Factory`](src/Factory/Factory.php). By default [`Factory\DefaultFactory`](src/Factory/DefaultFactory.php) factory is used.
 
-The most helpful are request preparers. You can redeclare `Factory\DefaultFactory::createRequestPreparers()`. It should return array of objects. Their classes should implement [`RequestPreparer\RequestPreparer`](src/RequestPreparer/RequestPreparer.php).
+The most helpful are the request preparers. You can override `Factory\DefaultFactory::createRequestPreparers()`. It should return an array of objects. Their classes should implement [`RequestPreparer\RequestPreparer`](src/RequestPreparer/RequestPreparer.php).
 
-Good example of request preparer is [`RequestPreparer\SoftMocksRequestPreparer`](src/RequestPreparer/SoftMocksRequestPreparer.php) and [`Factory\SoftMocksFactory`](src/Factory/SoftMocksFactory.php).
+You can use request preparer for example for changing path to files (in break points and execution files).
+
+Good example of the request preparer is [`RequestPreparer\SoftMocksRequestPreparer`](src/RequestPreparer/SoftMocksRequestPreparer.php). You can see its usage in [`Factory\SoftMocksFactory`](src/Factory/SoftMocksFactory.php).
 
 ### Using with soft-mocks
 
