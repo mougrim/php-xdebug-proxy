@@ -100,7 +100,7 @@ bin/xdebug-proxy --configs=/your/custom/path/config
 
 As mentioned [above](#factory-php) you can customize classes using your custom factory, which implements [`Factory\Factory`](src/Factory/Factory.php). By default [`Factory\DefaultFactory`](src/Factory/DefaultFactory.php) factory is used.
 
-The most helpful are the request preparers. You can override `Factory\DefaultFactory::createRequestPreparers()`. It should return an array of objects. Their classes should implement [`RequestPreparer\RequestPreparer`](src/RequestPreparer/RequestPreparer.php).
+The most powerful are the request preparers. You can override `Factory\DefaultFactory::createRequestPreparers()`. It  should return an array of objects which implement [`RequestPreparer\RequestPreparer`](src/RequestPreparer/RequestPreparer.php) interface.
 
 You can use request preparer for example for changing path to files (in break points and execution files).
 
@@ -113,3 +113,5 @@ See doc in [soft-mocks](https://github.com/badoo/soft-mocks/#using-with-xdebug) 
 ### Thanks
 
 Many thanks to [Eelf](https://github.com/eelf) for proxy example [smdbgpproxy](https://github.com/eelf/smdbgpproxy).
+
+Thanks to [Dmitry Ananyev](https://github.com/altexdim) for help with docs.

@@ -26,7 +26,7 @@ interface RequestPreparer
 
     /**
      * This method should return request based on $request, which will be sent to xdebug.
-     * Use $commandToXdebugParser for parse command in $request and build command back.
+     * Use $commandToXdebugParser to parse the command in request and to rebuild the command.
      *
      * @param string $request command from ide to xdebug
      * @param CommandToXdebugParser $commandToXdebugParser
