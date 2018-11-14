@@ -82,7 +82,8 @@ There are 3 files:
             ],
         ],
         'ideRegistrationServer' => [
-           // host:port for register ide in proxy
+            // host:port for register ide in proxy
+            // pass empty string if you want to disable ide registration
             'listen' => '127.0.0.1:9001',
         ],
     ];

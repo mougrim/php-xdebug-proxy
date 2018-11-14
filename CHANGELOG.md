@@ -4,9 +4,12 @@
 
 There are next changes:
 
+- possibility to disable IDE registration was added
+
 ### v0.2.0
 
 There are next changes:
+
 - defaultIde config param was added
 - predefinedIdeList config param was added
 - now by default debug and info logs are disabled

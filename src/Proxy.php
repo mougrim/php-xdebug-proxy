@@ -62,8 +62,14 @@ class Proxy
      */
     public function runIdeRegistration()
     {
+        $listen = $this->config->getIdeRegistrationServer()->getListen();
+        if (!$listen) {
+            $this->logger->notice('[Proxy][IdeRegistration] IDE registration is disabled by config, skip it.');
+
+            return;
+        }
         $ideHandler = asyncCoroutine([$this->ideHandler, 'handle']);
-        $server = listen($this->config->getIdeRegistrationServer()->getListen());
+        $server = listen($listen);
         $this->logger->notice("[Proxy][IdeRegistration] Listening for new connections on '{$server->getAddress()}'...");
         while ($socket = yield $server->accept()) {
             $ideHandler($socket);
