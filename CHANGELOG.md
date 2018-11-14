@@ -1,6 +1,6 @@
 ## PHP xdebug (dbgp) proxy ChangeLog
 
-## master
+### v0.2.0
 
 There are next changes:
 - defaultIde config param was added
