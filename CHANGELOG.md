@@ -7,6 +7,8 @@ There are next changes:
 - predefinedIdeList config param was added
 - now by default debug and info logs are disabled
 - log levels for some logs are changed
+- [README.md](README.md) was updated
+- doc for [`RequestPreparer\RequestPreparer`](src/RequestPreparer/RequestPreparer.php) was added
 
 ### v0.1.0
 
