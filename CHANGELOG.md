@@ -4,6 +4,10 @@
 
 There are next changes:
 
+### v0.2.1
+
+There are next changes:
+
 - possibility to disable IDE registration was added
 
 ### v0.2.0
