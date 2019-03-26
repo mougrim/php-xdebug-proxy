@@ -52,7 +52,12 @@ class Runner
 
                 return;
             }
-            $ideHandler = $factory->createIdeHandler($logger, $config->getIdeServer(), $xmlConverter, $requestPreparers);
+            $ideHandler = $factory->createIdeHandler(
+                $logger,
+                $config->getIdeServer(),
+                $xmlConverter,
+                $requestPreparers
+            );
             $xdebugHandler = $factory->createXdebugHandler($logger, $xmlConverter, $ideHandler);
             $factory->createProxy($logger, $config, $xmlConverter, $ideHandler, $xdebugHandler)
                 ->run();
@@ -65,8 +70,11 @@ class Runner
         }
     }
 
-    protected function showHelp($exitCode = 0)
+    protected function showHelp(int $exitCode = null)
     {
+        if ($exitCode === null) {
+            $exitCode = 0;
+        }
         $this->infoFallback('Usage:');
         $this->infoFallback("  {$this->getScriptName()} [options]");
         $this->infoFallback('');

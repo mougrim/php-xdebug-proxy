@@ -49,7 +49,7 @@ class DefaultXdebugHandler implements XdebugHandler
         if (!$this->requestBuffers->contains($socket)) {
             $this->requestBuffers->attach($socket, '');
         }
-        while (null !== $data = yield $socket->read()) {
+        while (($data = yield $socket->read()) !== null) {
             $buffer = $this->requestBuffers->offsetGet($socket);
             $buffer .= $data;
             while (substr_count($buffer, "\0") >= 2) {
@@ -91,7 +91,7 @@ class DefaultXdebugHandler implements XdebugHandler
                     $this->requestBuffers->detach($socket);
                     try {
                         yield $socket->end();
-                    } catch (ClosedException $ignore) {
+                    } /** @noinspection BadExceptionsProcessingInspection */ catch (ClosedException $ignore) {
                         // already closed
                     }
 

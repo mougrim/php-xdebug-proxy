@@ -11,6 +11,8 @@ use Mougrim\XdebugProxy\Xml\XmlParseException;
 use Mougrim\XdebugProxy\Xml\XmlValidateException;
 use Psr\Log\LoggerInterface;
 use Tests\Mougrim\XdebugProxy\TestCase;
+use const ENT_QUOTES;
+use const ENT_XML1;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
@@ -102,7 +104,10 @@ class DomXmlConverterTest extends TestCase
     public function testAttributeNameValidate()
     {
         $root = (new XmlContainer('root'))
-            ->addAttribute(\htmlspecialchars('>XSS</root><root attribute="', ENT_XML1 | ENT_QUOTES), 'value');
+            ->addAttribute(
+                \htmlspecialchars('>XSS</root><root attribute="', ENT_XML1 | ENT_QUOTES),
+                'value'
+            );
         $document = (new XmlDocument('1.0', 'UTF-8'))
             ->setRoot($root);
         $converter = new DomXmlConverter($this->createFakeLogger());
@@ -126,7 +131,9 @@ class DomXmlConverterTest extends TestCase
 
         $converter = new DomXmlConverter($this->createFakeLogger());
         $this->expectException(XmlParseException::class);
-        $this->expectExceptionMessageRegExp('/^(?:Xml should be without entity ref nodes|Too many child nodes in document)$/');
+        $this->expectExceptionMessageRegExp(
+            '/^(?:Xml should be without entity ref nodes|Too many child nodes in document)$/'
+        );
         $converter->parse($xml);
     }
 

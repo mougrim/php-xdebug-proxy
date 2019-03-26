@@ -37,8 +37,12 @@ class DefaultFactory implements Factory
      *
      * @return IdeHandler
      */
-    public function createIdeHandler(LoggerInterface $logger, IdeServerConfig $config, XmlConverter $xmlConverter, array $requestPreparers): IdeHandler
-    {
+    public function createIdeHandler(
+        LoggerInterface $logger,
+        IdeServerConfig $config,
+        XmlConverter $xmlConverter,
+        array $requestPreparers
+    ): IdeHandler {
         return new DefaultIdeHandler($logger, $config, $xmlConverter, $requestPreparers);
     }
 

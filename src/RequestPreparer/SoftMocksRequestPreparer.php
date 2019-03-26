@@ -7,6 +7,7 @@ use Mougrim\XdebugProxy\Handler\CommandToXdebugParser;
 use Mougrim\XdebugProxy\Xml\XmlDocument;
 use Psr\Log\LoggerInterface;
 use Throwable;
+use function file_exists;
 use function is_file;
 use function parse_url;
 use function rawurldecode;
@@ -21,32 +22,35 @@ class SoftMocksRequestPreparer implements RequestPreparer
 
     /**
      * @param LoggerInterface $logger
-     * @param string $init_script
+     * @param string $initScript
      *
      * @throws Error
      */
-    public function __construct(LoggerInterface $logger, string $init_script = '')
+    public function __construct(LoggerInterface $logger, string $initScript = null)
     {
+        if ($initScript === null) {
+            $initScript = '';
+        }
         $this->logger = $logger;
-        if (!$init_script) {
-            $possible_init_script_paths = [
+        if (!$initScript) {
+            $possibleInitScriptPaths = [
                 __DIR__.'/../../vendor/badoo/soft-mocks/src/init_with_composer.php',
                 __DIR__.'/../../../../badoo/soft-mocks/src/init_with_composer.php',
             ];
-            foreach ($possible_init_script_paths as $possible_init_script_path) {
-                if (file_exists($possible_init_script_path)) {
-                    $init_script = $possible_init_script_path;
+            foreach ($possibleInitScriptPaths as $possiblInitScriptPath) {
+                if (file_exists($possiblInitScriptPath)) {
+                    $initScript = $possiblInitScriptPath;
 
                     break;
                 }
             }
         }
 
-        if (!$init_script) {
+        if (!$initScript) {
             throw new Error("Can't find soft-mocks init script");
         }
         /** @noinspection PhpIncludeInspection */
-        require $init_script;
+        require $initScript;
     }
 
     public function prepareRequestToIde(XmlDocument $xmlRequest, string $rawRequest)
@@ -123,7 +127,7 @@ class SoftMocksRequestPreparer implements RequestPreparer
 
     protected function getRewrittenFilePath(string $file, array $context): string
     {
-        $original_file = $file;
+        $originalFile = $file;
         $parts = parse_url($file);
         if ($parts === false) {
             $this->logger->warning("Can't parse file '{$file}'", $context);
@@ -136,23 +140,23 @@ class SoftMocksRequestPreparer implements RequestPreparer
             return '';
         }
         try {
-            $rewritten_file = (string) SoftMocks::getRewrittenFilePath($parts['path']);
+            $rewrittenFile = (string) SoftMocks::getRewrittenFilePath($parts['path']);
         } catch (Throwable $throwable) {
             $this->logger->warning("Can't get rewritten file path: {$throwable}", $context);
 
             return '';
         }
-        if (!$rewritten_file) {
+        if (!$rewrittenFile) {
             return '';
         }
-        if (is_file($rewritten_file)) {
-            $file = realpath($rewritten_file);
+        if (is_file($rewrittenFile)) {
+            $file = realpath($rewrittenFile);
             if (!$file) {
-                $this->logger->error("Can't get real path for {$rewritten_file}", $context);
+                $this->logger->error("Can't get real path for {$rewrittenFile}", $context);
             }
         } else {
-            $this->logger->debug("Rewritten file '{$rewritten_file}' isn't exists for '{$original_file}'", $context);
-            $file = $rewritten_file;
+            $this->logger->debug("Rewritten file '{$rewrittenFile}' isn't exists for '{$originalFile}'", $context);
+            $file = $rewrittenFile;
         }
         if (!$file) {
             return '';

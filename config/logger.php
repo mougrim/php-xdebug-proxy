@@ -12,7 +12,9 @@ use const STDOUT;
 use function class_exists;
 
 if (!class_exists(StreamHandler::class)) {
-    throw new RunError('You should install "amphp/log" by default or provide your custom config/logger.php via config for use php-xdebug-proxy');
+    throw new RunError(
+        'You should install "amphp/log" by default or provide your custom config/logger.php via config for use php-xdebug-proxy'
+    );
 }
 
 return (new Logger('xdebug-proxy'))
