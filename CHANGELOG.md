@@ -4,6 +4,9 @@
 
 There are next changes:
 
+- there were code style fixes
+- more info about default IDE in config was added to README.md
+
 ### v0.2.1
 
 There are next changes:
