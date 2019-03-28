@@ -44,15 +44,17 @@ bin/xdebug-proxy
 The proxy will be run with default config:
 ```text
 Using config path /path/to/php-xdebug-proxy/config
-[2018-06-21 09:31:51] xdebug-proxy.NOTICE: [Proxy][IdeRegistration] Listening for new connections on '127.0.0.1:9001'... array ( ) array ( )
-[2018-06-21 09:31:51] xdebug-proxy.NOTICE: [Proxy][Xdebug] Listening for new connections on '127.0.0.1:9002'... array ( ) array ( )
+[2019-02-14 10:46:24] xdebug-proxy.NOTICE: Use default ide: 127.0.0.1:9000 array ( ) array ( )
+[2019-02-14 10:46:24] xdebug-proxy.NOTICE: Use predefined ides array (   'predefinedIdeList' =>    array (     'idekey' => '127.0.0.1:9000',   ), ) array ( )
+[2019-02-14 10:46:24] xdebug-proxy.NOTICE: [Proxy][IdeRegistration] Listening for new connections on '127.0.0.1:9001'... array ( ) array ( )
+[2019-02-14 10:46:24] xdebug-proxy.NOTICE: [Proxy][Xdebug] Listening for new connections on '127.0.0.1:9002'... array ( ) array ( )
 ```
 
-So by default proxy listens '127.0.0.1:9001' for ide registration connections and '127.0.0.1:9002' for xdebug connections.
+So by default proxy listens `127.0.0.1:9001` for ide registration connections and `127.0.0.1:9002` for xdebug connections, use `127.0.0.1:9000` as default IDE and predefined IDE with key `idekey`.
 
 ### Config
 
-If you want to customize a logger, to configure your factory or logger, you can use custom config path. Just copy [`config`](config) directory to your custom path:
+If you want to configure listening ports, etc., you can use custom config path. Just copy [`config`](config) directory to your custom path:
 
 ```bash
 cp -r /path/to/php-xdebug-proxy/config /your/custom/path
