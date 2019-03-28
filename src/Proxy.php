@@ -70,7 +70,9 @@ class Proxy
         }
         $ideHandler = asyncCoroutine([$this->ideHandler, 'handle']);
         $server = listen($listen);
-        $this->logger->notice("[Proxy][IdeRegistration] Listening for new connections on '{$server->getAddress()}'...");
+        $this->logger->notice(
+            "[Proxy][IdeRegistration] Listening for new connections on '{$server->getAddress()}'..."
+        );
         while ($socket = yield $server->accept()) {
             $ideHandler($socket);
         }

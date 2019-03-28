@@ -10,7 +10,7 @@ class XmlContainer
     protected $name;
     protected $attributes = [];
     protected $content = '';
-    protected $is_content_cdata = false;
+    protected $isContentCdata = false;
     protected $children = [];
 
     public function __construct(string $name)
@@ -75,17 +75,17 @@ class XmlContainer
 
     public function isContentCdata(): bool
     {
-        return $this->is_content_cdata;
+        return $this->isContentCdata;
     }
 
     /**
-     * @param bool $is_content_cdata
+     * @param bool $isContentCdata
      *
      * @return $this
      */
-    public function setIsContentCdata(bool $is_content_cdata): XmlContainer
+    public function setIsContentCdata(bool $isContentCdata): XmlContainer
     {
-        $this->is_content_cdata = $is_content_cdata;
+        $this->isContentCdata = $isContentCdata;
 
         return $this;
     }

@@ -77,8 +77,12 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
      * @param XmlConverter $xmlConverter
      * @param RequestPreparer[] $requestPreparers
      */
-    public function __construct(LoggerInterface $logger, IdeServerConfig $config, XmlConverter $xmlConverter, array $requestPreparers)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        IdeServerConfig $config,
+        XmlConverter $xmlConverter,
+        array $requestPreparers
+    ) {
         $this->logger = $logger;
         $this->config = $config;
         $this->xmlConverter = $xmlConverter;
@@ -130,7 +134,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         $this->logger->notice('[IdeRegistration] Accepted connection.', $baseContext);
 
         $request = '';
-        while (null !== $data = yield $socket->read()) {
+        while (($data = yield $socket->read()) !== null) {
             $request .= $data;
             if (strpos($request, "\0") !== false) {
                 break;
@@ -266,7 +270,8 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                 $this->logger->notice("[IdeRegistration] Can't generate response: {$exception}", $context);
                 try {
                     yield $socket->end();
-                } catch (ClosedException $e) {
+                } /** @noinspection BadExceptionsProcessingInspection */ catch (ClosedException $ignoreException) {
+                    // we can't do anything else after try to close connection
                 }
 
                 return;
@@ -276,12 +281,15 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         if ($responses) {
             $response = implode("\0", $responses);
         }
-        $this->logger->notice('[IdeRegistration] Send response.', $baseContext + ['response' => $response]);
+        $this->logger->notice(
+            '[IdeRegistration] Send response.',
+            $baseContext + ['response' => $response]
+        );
         try {
             yield $socket->end($response);
-        } catch (ClosedException $e) {
+        } catch (ClosedException $exception) {
             $this->logger->error(
-                "[IdeRegistration] Can't write response to ide",
+                "[IdeRegistration] Can't write response to ide: {$exception}",
                 $baseContext + ['response' => $response]
             );
         }
@@ -368,7 +376,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
 
         try {
             yield $ideSocket->end();
-        } catch (ClosedException $ignore) {
+        } /** @noinspection BadExceptionsProcessingInspection */ catch (ClosedException $ignore) {
             // already closed
         }
         $this->ideSockets->detach($xdebugSocket);
@@ -438,7 +446,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         ];
         $buffer = '';
         try {
-            while (null !== $chunk = yield $ideSocket->read()) {
+            while (($chunk = yield $ideSocket->read()) !== null) {
                 $buffer .= $chunk;
                 while (strpos($buffer, "\0") !== false) {
                     list($request, $buffer) = explode("\0", $buffer, 2);
@@ -454,7 +462,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                     $xdebugSocket->write($request."\0");
                 }
             }
-        } catch (ClosedException $exception) {
+        } /** @noinspection BadExceptionsProcessingInspection */ catch (ClosedException $exception) {
             // skip exception, close other connections below
         } catch (RequestPreparerError $error) {
             $this->logger->critical(
@@ -475,7 +483,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         $this->close($xdebugSocket);
         try {
             yield $xdebugSocket->end();
-        } catch (ClosedException $e) {
+        } /** @noinspection BadExceptionsProcessingInspection */ catch (ClosedException $ignore) {
             // already closed
         }
     }
@@ -517,12 +525,12 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
 
     public function buildCommand(string $command, array $arguments): string
     {
-        $argument_strings = [];
+        $argumentStrings = [];
         foreach ($arguments as $argument => $value) {
-            $argument_strings[] = "{$argument} {$value}";
+            $argumentStrings[] = "{$argument} {$value}";
         }
 
-        return $command.' '.implode(' ', $argument_strings);
+        return $command.' '.implode(' ', $argumentStrings);
     }
 
     protected function parseArguments(string $arguments): array

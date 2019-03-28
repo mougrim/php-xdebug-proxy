@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection PhpComposerExtensionStubsInspection ext-dom is declared as suggest */
+
 namespace Mougrim\XdebugProxy\Xml;
 
 use DOMCdataSection;
@@ -11,6 +13,21 @@ use DOMNode;
 use DOMText;
 use DOMXPath;
 use Psr\Log\LoggerInterface;
+use const E_COMPILE_ERROR;
+use const E_COMPILE_WARNING;
+use const E_CORE_ERROR;
+use const E_CORE_WARNING;
+use const E_DEPRECATED;
+use const E_ERROR;
+use const E_NOTICE;
+use const E_PARSE;
+use const E_RECOVERABLE_ERROR;
+use const E_STRICT;
+use const E_USER_DEPRECATED;
+use const E_USER_ERROR;
+use const E_USER_NOTICE;
+use const E_USER_WARNING;
+use const E_WARNING;
 use const LIBXML_NONET;
 use function count;
 use function error_clear_last;
@@ -77,7 +94,7 @@ class DomXmlConverter implements XmlConverter
     public function parse(string $xml): XmlDocument
     {
         $domDocument = new DOMDocument();
-        $oldDisableValue = libxml_disable_entity_loader(true);
+        $oldDisableValue = libxml_disable_entity_loader();
         $result = @$domDocument->loadXML($xml, LIBXML_NONET);
         libxml_disable_entity_loader($oldDisableValue);
         if (!$result) {
