@@ -38,6 +38,10 @@ interface Factory
     ): IdeHandler;
 
     /**
+     * Request preparers will be called:
+     * - on request to ide from first to last;
+     * - on request to xdebug from last to first.
+     *
      * @param LoggerInterface $logger
      *
      * @throws RequestPreparerException

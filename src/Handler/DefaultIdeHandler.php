@@ -21,6 +21,7 @@ use function Amp\asyncCoroutine;
 use function Amp\Socket\connect;
 use function array_diff;
 use function array_keys;
+use function array_reverse;
 use function array_slice;
 use function count;
 use function explode;
@@ -498,7 +499,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
      */
     protected function prepareRequestToXdebug(string $request, array $context): string
     {
-        foreach ($this->requestPreparers as $requestPreparer) {
+        foreach (array_reverse($this->requestPreparers) as $requestPreparer) {
             try {
                 $request = $requestPreparer->prepareRequestToXdebug($request, $this);
             } catch (RequestPreparerException $exception) {
