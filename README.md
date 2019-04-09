@@ -105,6 +105,10 @@ As mentioned [above](#factory-php) you can customize classes using your custom f
 
 The most powerful are the request preparers. You can override `Factory\DefaultFactory::createRequestPreparers()`. It  should return an array of objects which implement [`RequestPreparer\RequestPreparer`](src/RequestPreparer/RequestPreparer.php) interface.
 
+Request preparers will be called:
+- on request to ide from first to last
+- on request to xdebug from last to first
+
 You can use request preparer for example for changing path to files (in break points and execution files).
 
 Good example of the request preparer is [`RequestPreparer\SoftMocksRequestPreparer`](src/RequestPreparer/SoftMocksRequestPreparer.php). You can see its usage in [`Factory\SoftMocksFactory`](src/Factory/SoftMocksFactory.php).

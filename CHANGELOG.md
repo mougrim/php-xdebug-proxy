@@ -6,6 +6,7 @@ There are next changes:
 
 - there were code style fixes
 - more info about default IDE in config was added to README.md
+- now request preparers are called on request to xdebug from last to first
 
 ### v0.2.1
 
