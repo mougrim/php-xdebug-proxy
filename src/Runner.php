@@ -23,7 +23,7 @@ use function realpath;
  */
 class Runner
 {
-    public function run()
+    public function run(): void
     {
         try {
             $options = $this->getOptions();
@@ -70,7 +70,7 @@ class Runner
         }
     }
 
-    protected function showHelp(int $exitCode = null)
+    protected function showHelp(int $exitCode = null): void
     {
         if ($exitCode === null) {
             $exitCode = 0;
@@ -172,17 +172,17 @@ class Runner
         return $_SERVER['argv'][0] ?? 'xdebug-proxy';
     }
 
-    protected function end(int $exitCode)
+    protected function end(int $exitCode): void
     {
         exit($exitCode);
     }
 
-    protected function errorFallback(string $message)
+    protected function errorFallback(string $message): void
     {
         fwrite(STDERR, $message.PHP_EOL);
     }
 
-    protected function infoFallback(string $message)
+    protected function infoFallback(string $message): void
     {
         fwrite(STDOUT, $message.PHP_EOL);
     }

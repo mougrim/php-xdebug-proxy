@@ -11,7 +11,7 @@ class XmlDocument
     protected $encoding;
     protected $root;
 
-    public function __construct(string $version, string $encoding = null)
+    public function __construct(string $version, ?string $encoding = null)
     {
         $this->version = $version;
         $this->encoding = $encoding;
@@ -22,18 +22,12 @@ class XmlDocument
         return $this->version;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getEncoding()
+    public function getEncoding(): ?string
     {
         return $this->encoding;
     }
 
-    /**
-     * @return XmlContainer|null
-     */
-    public function getRoot()
+    public function getRoot(): ?XmlContainer
     {
         return $this->root;
     }

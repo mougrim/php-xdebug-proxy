@@ -1,8 +1,9 @@
 language: php
 php:
+  - 7.4
+  - 7.3
   - 7.2
   - 7.1
-  - 7.0
 
 dist: xenial
 
@@ -15,15 +16,6 @@ cache:
     - $HOME/.composer/cache
 
 before_script:
-  - "if [ `php -r 'echo (PHP_VERSION_ID < 70100 ? 0 : 1);'` -eq '1' ]; then
-       echo 'new';
-       composer install --verbose;
-     else
-       echo 'old';
-       composer remove --no-update --verbose --dev friendsofphp/php-cs-fixer;
-       composer remove --no-update --verbose --dev phpro/grumphp;
-       composer require --no-update --verbose --dev 'phpunit/phpunit':'^6';
-       composer update --verbose --with-dependencies friendsofphp/php-cs-fixer phpro/grumphp phpunit/phpunit;
-     fi"
+  - composer install --verbose
 
 script: vendor/bin/phpunit

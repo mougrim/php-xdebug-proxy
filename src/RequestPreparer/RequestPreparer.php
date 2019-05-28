@@ -22,7 +22,7 @@ interface RequestPreparer
      *
      * @return void
      */
-    public function prepareRequestToIde(XmlDocument $xmlRequest, string $rawRequest);
+    public function prepareRequestToIde(XmlDocument $xmlRequest, string $rawRequest): void;
 
     /**
      * This method should return request based on $request, which will be sent to xdebug.

@@ -3,8 +3,8 @@
 namespace Mougrim\XdebugProxy;
 
 use Monolog\Formatter\LineFormatter;
-use function /** @noinspection ForgottenDebugOutputInspection */ var_export;
 use function is_scalar;
+use function /** @noinspection ForgottenDebugOutputInspection */ var_export;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
