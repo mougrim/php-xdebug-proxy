@@ -13,13 +13,14 @@ use Psr\Log\LoggerInterface;
 use Tests\Mougrim\XdebugProxy\TestCase;
 use const ENT_QUOTES;
 use const ENT_XML1;
+use function htmlspecialchars;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
  */
 class DomXmlConverterTest extends TestCase
 {
-    public function testParseGenerate()
+    public function testParseGenerate(): void
     {
         $xml = '<?xml version="1.0" encoding="UTF-8"?>
 <root><child id="1">Child1</child><child id="2">Child2<sub-child>SubChild1</sub-child><sub-child>SubChild2</sub-child></child></root>
@@ -61,7 +62,7 @@ class DomXmlConverterTest extends TestCase
         static::assertSame($xml, $converter->generate($document));
     }
 
-    public function testParseGenerateEscaping()
+    public function testParseGenerateEscaping(): void
     {
         $xml = '<?xml version="1.0" encoding="UTF-8"?>
 <root attribute="&quot;&gt;xss&lt;/root&gt;&lt;root&gt;">&lt;/root&gt;&lt;root&gt;xss</root>
@@ -79,7 +80,7 @@ class DomXmlConverterTest extends TestCase
         static::assertSame($xml, $converter->generate($document));
     }
 
-    public function testWrongNameDecoding()
+    public function testWrongNameDecoding(): void
     {
         $xml = '<?xml version="1.0" encoding="UTF-8"?>
 <&lt;rootattribute=&quot;value1&quot;&gt attribute="value2">Content</&lt;rootattribute=&quot;value1&quot;&gt>
@@ -90,9 +91,9 @@ class DomXmlConverterTest extends TestCase
         $converter->parse($xml);
     }
 
-    public function testNameValidate()
+    public function testNameValidate(): void
     {
-        $root = new XmlContainer(\htmlspecialchars('<rootattribute="value">', ENT_XML1 | ENT_QUOTES));
+        $root = new XmlContainer(htmlspecialchars('<rootattribute="value">', ENT_XML1 | ENT_QUOTES));
         $document = (new XmlDocument('1.0', 'UTF-8'))
             ->setRoot($root);
         $converter = new DomXmlConverter($this->createFakeLogger());
@@ -101,11 +102,11 @@ class DomXmlConverterTest extends TestCase
         $converter->generate($document);
     }
 
-    public function testAttributeNameValidate()
+    public function testAttributeNameValidate(): void
     {
         $root = (new XmlContainer('root'))
             ->addAttribute(
-                \htmlspecialchars('>XSS</root><root attribute="', ENT_XML1 | ENT_QUOTES),
+                htmlspecialchars('>XSS</root><root attribute="', ENT_XML1 | ENT_QUOTES),
                 'value'
             );
         $document = (new XmlDocument('1.0', 'UTF-8'))
@@ -119,7 +120,7 @@ class DomXmlConverterTest extends TestCase
     /**
      * @see https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Processing
      */
-    public function testXxe()
+    public function testXxe(): void
     {
         /** @noinspection CheckDtdRefs */
         $xml = '<?xml version="1.0"?>
@@ -137,7 +138,7 @@ class DomXmlConverterTest extends TestCase
         $converter->parse($xml);
     }
 
-    public function testXdebugInit()
+    public function testXdebugInit(): void
     {
         $xml = '<?xml version="1.0" encoding="iso-8859-1"?>
 <init xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" fileuri="file:///path/to/file.php" language="PHP" xdebug:language_version="7.1.15-1+os1.02.3+some.site.org+1" protocol_version="1.0" appid="15603" idekey="idekey"><engine version="2.6.0"><![CDATA[Xdebug]]></engine><author><![CDATA[Derick Rethans]]></author><url><![CDATA[http://xdebug.org]]></url><copyright><![CDATA[Copyright (c) 2002-2018 by Derick Rethans]]></copyright></init>
@@ -203,7 +204,7 @@ class DomXmlConverterTest extends TestCase
         static::assertSame($xml, $converter->generate($document));
     }
 
-    public function testXdebugMessage()
+    public function testXdebugMessage(): void
     {
         $xml = '<?xml version="1.0" encoding="iso-8859-1"?>
 <response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="step_into" transaction_id="8" status="break" reason="ok"><xdebug:message filename="file:///home/mougrim/Private/development/mougrim/php-xdebug-proxy/bin/test.php" lineno="11"></xdebug:message></response>';

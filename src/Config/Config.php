@@ -7,15 +7,15 @@ namespace Mougrim\XdebugProxy\Config;
  */
 class Config
 {
-    const DEFAULT_XDEBUG_SERVER_CONFIG = [
+    public const DEFAULT_XDEBUG_SERVER_CONFIG = [
         'listen' => '127.0.0.1:9002',
     ];
 
-    const DEFAULT_IDE_REGISTRATION_SERVER_CONFIG = [
+    public const DEFAULT_IDE_REGISTRATION_SERVER_CONFIG = [
         'listen' => '127.0.0.1:9001',
     ];
 
-    const DEFAULT_IDE_SERVER_CONFIG = [
+    public const DEFAULT_IDE_SERVER_CONFIG = [
         'defaultIde' => '127.0.0.1:9000',
         'predefinedIdeList' => [
             'idekey' => '127.0.0.1:9000',

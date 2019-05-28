@@ -1,13 +1,20 @@
 <?php
 use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
+use PhpCsFixer\Fixer\Import\OrderedImportsFixer;
 
 return Config::create()
     ->setRiskyAllowed(true)
     ->setRules([
         '@Symfony' => true,
         'array_syntax' => ['syntax' => 'short'],
-        'ordered_imports' => true,
+        'ordered_imports' => [
+            'importsOrder' => [
+                OrderedImportsFixer::IMPORT_TYPE_CLASS,
+                OrderedImportsFixer::IMPORT_TYPE_CONST,
+                OrderedImportsFixer::IMPORT_TYPE_FUNCTION,
+            ],
+        ],
         'php_unit_construct' => true,
         'php_unit_strict' => true,
         'strict_comparison' => true,

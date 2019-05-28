@@ -36,30 +36,6 @@ use function strpos;
  */
 class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
 {
-    /** @protected */
-    const REGISTRATION_COMMAND_INIT = 'proxyinit';
-    /** @protected */
-    const REGISTRATION_COMMAND_STOP = 'proxystop';
-
-    /** @protected */
-    const REGISTRATION_ERROR_UNKNOWN_COMMAND = 1;
-    /** @protected */
-    const REGISTRATION_ERROR_ARGUMENT_FORMAT = 2;
-    /** @protected */
-    const REGISTRATION_ERROR_MISSING_REQUIRED_ARGUMENTS = 3;
-
-    /** @protected */
-    const REGISTRATION_ARGUMENTS = [
-        self::REGISTRATION_COMMAND_INIT => [
-            'supportedArguments' => ['-p', '-k'],
-            'requiredArguments' => ['-p', '-k'],
-        ],
-        self::REGISTRATION_COMMAND_STOP => [
-            'supportedArguments' => ['-k'],
-            'requiredArguments' => ['-k'],
-        ],
-    ];
-
     protected $logger;
     protected $config;
     protected $xmlConverter;
@@ -128,7 +104,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
      */
     public function handle(ServerSocket $socket): Generator
     {
-        list($ip, $port) = explode(':', $socket->getRemoteAddress());
+        [$ip, $port] = explode(':', $socket->getRemoteAddress());
         $baseContext = [
             'ide' => "{$ip}:{$port}",
         ];
@@ -162,7 +138,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
             }
             $this->logger->notice('[IdeRegistration] Process request from IDE.', $context);
 
-            list($command, $arguments) = $this->parseCommand($request);
+            [$command, $arguments] = $this->parseCommand($request);
             $context['command'] = $command;
 
             try {
@@ -351,7 +327,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
      *
      * @return void
      */
-    protected function prepareRequestToIde(XmlDocument $xmlRequest, string $rawRequest, array $context)
+    protected function prepareRequestToIde(XmlDocument $xmlRequest, string $rawRequest, array $context): void
     {
         foreach ($this->requestPreparers as $requestPreparer) {
             try {
@@ -450,7 +426,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
             while (($chunk = yield $ideSocket->read()) !== null) {
                 $buffer .= $chunk;
                 while (strpos($buffer, "\0") !== false) {
-                    list($request, $buffer) = explode("\0", $buffer, 2);
+                    [$request, $buffer] = explode("\0", $buffer, 2);
                     $this->logger->info(
                         '[Xdebug][Ide] Process ide request',
                         $context + ['request' => $request]
@@ -518,7 +494,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
 
     public function parseCommand(string $request): array
     {
-        list($command, $arguments) = explode(' ', $request, 2);
+        [$command, $arguments] = explode(' ', $request, 2);
         $arguments = $this->parseArguments($arguments);
 
         return [$command, $arguments];

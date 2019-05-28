@@ -3,7 +3,7 @@
     "description": "Xdebug (dbgp) proxy",
     "type": "project",
     "require": {
-        "php": ">=7",
+        "php": ">=7.1",
         "amphp/socket": "^0.10.8"
     },
     "require-dev": {
