@@ -4,6 +4,7 @@ namespace Mougrim\XdebugProxy;
 
 use Amp\Loop;
 use Amp\Socket\SocketException;
+use Generator;
 use Mougrim\XdebugProxy\Config\Config;
 use Mougrim\XdebugProxy\Handler\IdeHandler;
 use Mougrim\XdebugProxy\Handler\XdebugHandler;
@@ -37,7 +38,7 @@ class Proxy
         $this->xdebugHandler = $xdebugHandler;
     }
 
-    public function run()
+    public function run(): void
     {
         Loop::defer([$this, 'runIdeRegistration']);
         Loop::defer([$this, 'runXdebug']);
@@ -47,7 +48,7 @@ class Proxy
     /**
      * @throws SocketException
      */
-    public function runXdebug()
+    public function runXdebug(): Generator
     {
         $xdebugHandler = asyncCoroutine([$this->xdebugHandler, 'handle']);
         $server = listen($this->config->getXdebugServer()->getListen());
@@ -60,7 +61,7 @@ class Proxy
     /**
      * @throws SocketException
      */
-    public function runIdeRegistration()
+    public function runIdeRegistration(): Generator
     {
         $listen = $this->config->getIdeRegistrationServer()->getListen();
         if (!$listen) {

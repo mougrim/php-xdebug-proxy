@@ -153,11 +153,14 @@ class DomXmlConverter implements XmlConverter
     {
         $container = new XmlContainer($domElement->tagName);
         $xpath = new DOMXPath($domDocument);
-        foreach ($xpath->query('namespace::*|attribute::*', $domElement) as /** @var DOMNode $node */$node) {
-            if (!$domElement->hasAttribute($node->nodeName)) {
-                continue;
+        $nodes = $xpath->query('namespace::*|attribute::*', $domElement);
+        if ($nodes) {
+            foreach ($nodes as /** @var DOMNode $node */ $node) {
+                if (!$domElement->hasAttribute($node->nodeName)) {
+                    continue;
+                }
+                $container->addAttribute($node->nodeName, $node->nodeValue);
             }
-            $container->addAttribute($node->nodeName, $node->nodeValue);
         }
         $content = '';
         foreach ($domElement->childNodes as /** @var DOMNode $child */$child) {

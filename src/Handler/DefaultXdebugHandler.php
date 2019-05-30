@@ -55,7 +55,7 @@ class DefaultXdebugHandler implements XdebugHandler
             while (substr_count($buffer, "\0") >= 2) {
                 $exception = null;
                 try {
-                    list($length, $request, $buffer) = explode("\0", $buffer, 3);
+                    [$length, $request, $buffer] = explode("\0", $buffer, 3);
                     $context = $baseContext + ['request' => $request, 'requestLength' => $length];
                     $this->logger->info('[Xdebug] Process request', $context);
 
