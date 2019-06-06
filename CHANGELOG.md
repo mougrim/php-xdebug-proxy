@@ -4,6 +4,10 @@
 
 There are next changes:
 
+### v0.3.0
+
+There are next changes:
+
 - there were code style fixes [#14](https://github.com/mougrim/php-xdebug-proxy/pull/14)
 - more info about default IDE in config was added to README.md [#15](https://github.com/mougrim/php-xdebug-proxy/pull/15)
 - now request preparers are called on request to xdebug from last to first [#16](https://github.com/mougrim/php-xdebug-proxy/pull/16)
