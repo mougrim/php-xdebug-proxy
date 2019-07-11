@@ -11,6 +11,7 @@ class XmlContainer
     protected $attributes = [];
     protected $content = '';
     protected $isContentCdata = false;
+    /** @var XmlContainer[] */
     protected $children = [];
 
     public function __construct(string $name)
@@ -21,6 +22,11 @@ class XmlContainer
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function getAttribute(string $name): ?string
+    {
+        return $this->attributes[$name] ?? null;
     }
 
     /**
@@ -120,5 +126,21 @@ class XmlContainer
         $this->children = $children;
 
         return $this;
+    }
+
+    public function toArray(): array
+    {
+        $children = [];
+        foreach ($this->children as $child) {
+            $children[] = $child->toArray();
+        }
+
+        return [
+            'name' => $this->name,
+            'attributes' => $this->attributes,
+            'content' => $this->content,
+            'isContentCdata' => $this->isContentCdata,
+            'children' => $children,
+        ];
     }
 }

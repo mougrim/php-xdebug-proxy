@@ -58,6 +58,54 @@ class DomXmlConverterTest extends TestCase
         static::assertSame('SubChild2', $subChildren[1]->getContent());
         static::assertEmpty($subChildren[1]->getAttributes());
         static::assertEmpty($subChildren[1]->getChildren());
+        static::assertSame(
+            [
+                'version' => '1.0',
+                'encoding' => 'UTF-8',
+                'root' => [
+                    'name' => 'root',
+                    'attributes' => [],
+                    'content' => '',
+                    'isContentCdata' => false,
+                    'children' => [
+                        [
+                            'name' => 'child',
+                            'attributes' => [
+                                'id' => '1',
+                            ],
+                            'content' => 'Child1',
+                            'isContentCdata' => false,
+                            'children' => [],
+                        ],
+                        [
+                            'name' => 'child',
+                            'attributes' => [
+                                'id' => '2',
+                            ],
+                            'content' => 'Child2',
+                            'isContentCdata' => false,
+                            'children' => [
+                                [
+                                    'name' => 'sub-child',
+                                    'attributes' => [],
+                                    'content' => 'SubChild1',
+                                    'isContentCdata' => false,
+                                    'children' => [],
+                                ],
+                                [
+                                    'name' => 'sub-child',
+                                    'attributes' => [],
+                                    'content' => 'SubChild2',
+                                    'isContentCdata' => false,
+                                    'children' => [],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            $document->toArray()
+        );
 
         static::assertSame($xml, $converter->generate($document));
     }
@@ -77,6 +125,22 @@ class DomXmlConverterTest extends TestCase
         static::assertSame('</root><root>xss', $root->getContent());
         static::assertSame(['attribute' => '">xss</root><root>'], $root->getAttributes());
         static::assertEmpty($root->getChildren());
+        static::assertSame(
+            [
+                'version' => '1.0',
+                'encoding' => 'UTF-8',
+                'root' => [
+                    'name' => 'root',
+                    'attributes' => [
+                        'attribute' => '">xss</root><root>',
+                    ],
+                    'content' => '</root><root>xss',
+                    'isContentCdata' => false,
+                    'children' => [],
+                ],
+            ],
+            $document->toArray()
+        );
         static::assertSame($xml, $converter->generate($document));
     }
 
@@ -201,6 +265,61 @@ class DomXmlConverterTest extends TestCase
         static::assertEmpty($children[3]->getAttributes());
         static::assertCount(0, $children[3]->getChildren());
 
+        static::assertSame(
+            [
+                'version' => '1.0',
+                'encoding' => 'iso-8859-1',
+                'root' => [
+                    'name' => 'init',
+                    'attributes' => [
+                        'xmlns:xdebug' => 'http://xdebug.org/dbgp/xdebug',
+                        'xmlns' => 'urn:debugger_protocol_v1',
+                        'fileuri' => 'file:///path/to/file.php',
+                        'language' => 'PHP',
+                        'xdebug:language_version' => '7.1.15-1+os1.02.3+some.site.org+1',
+                        'protocol_version' => '1.0',
+                        'appid' => '15603',
+                        'idekey' => 'idekey',
+                    ],
+                    'content' => '',
+                    'isContentCdata' => false,
+                    'children' => [
+                        [
+                            'name' => 'engine',
+                            'attributes' => [
+                                'version' => '2.6.0',
+                            ],
+                            'content' => 'Xdebug',
+                            'isContentCdata' => true,
+                            'children' => [],
+                        ],
+                        [
+                            'name' => 'author',
+                            'attributes' => [],
+                            'content' => 'Derick Rethans',
+                            'isContentCdata' => true,
+                            'children' => [],
+                        ],
+                        [
+                            'name' => 'url',
+                            'attributes' => [],
+                            'content' => 'http://xdebug.org',
+                            'isContentCdata' => true,
+                            'children' => [],
+                        ],
+                        [
+                            'name' => 'copyright',
+                            'attributes' => [],
+                            'content' => 'Copyright (c) 2002-2018 by Derick Rethans',
+                            'isContentCdata' => true,
+                            'children' => [],
+                        ],
+                    ],
+                ],
+            ],
+            $document->toArray()
+        );
+
         static::assertSame($xml, $converter->generate($document));
     }
 
@@ -246,6 +365,39 @@ class DomXmlConverterTest extends TestCase
             $children[0]->getAttributes()
         );
         static::assertCount(0, $children[0]->getChildren());
+
+        static::assertSame(
+            [
+                'version' => '1.0',
+                'encoding' => 'iso-8859-1',
+                'root' => [
+                    'name' => 'response',
+                    'attributes' => [
+                        'xmlns:xdebug' => 'http://xdebug.org/dbgp/xdebug',
+                        'xmlns' => 'urn:debugger_protocol_v1',
+                        'command' => 'step_into',
+                        'transaction_id' => '8',
+                        'status' => 'break',
+                        'reason' => 'ok',
+                    ],
+                    'content' => '',
+                    'isContentCdata' => false,
+                    'children' => [
+                        [
+                            'name' => 'xdebug:message',
+                            'attributes' => [
+                                'filename' => 'file:///home/mougrim/Private/development/mougrim/php-xdebug-proxy/bin/test.php',
+                                'lineno' => '11',
+                            ],
+                            'content' => '',
+                            'isContentCdata' => false,
+                            'children' => [],
+                        ],
+                    ],
+                ],
+            ],
+            $document->toArray()
+        );
     }
 
     protected function createFakeLogger(): LoggerInterface
