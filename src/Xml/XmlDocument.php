@@ -9,6 +9,7 @@ class XmlDocument
 {
     protected $version;
     protected $encoding;
+    /** @var XmlContainer|null */
     protected $root;
 
     public function __construct(string $version, ?string $encoding = null)
@@ -42,5 +43,14 @@ class XmlDocument
         $this->root = $root;
 
         return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'version' => $this->version,
+            'encoding' => $this->encoding,
+            'root' => $this->root ? $this->root->toArray() : null,
+        ];
     }
 }

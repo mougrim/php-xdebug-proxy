@@ -3,6 +3,10 @@
 ### master
 
 There are next changes:
+- next methods were added:
+-- \Mougrim\XdebugProxy\Xml\XmlDocument::toArray
+-- \Mougrim\XdebugProxy\Xml\XmlContainer::toArray
+-- \Mougrim\XdebugProxy\Xml\XmlContainer::getAttribute
 
 ### v0.3.0
 
