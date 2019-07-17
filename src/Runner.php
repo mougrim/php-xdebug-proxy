@@ -43,7 +43,7 @@ class Runner
             $xmlConverter = $factory->createXmlConverter($logger);
             $requestPreparers = [];
             try {
-                $requestPreparers = $factory->createRequestPreparers($logger);
+                $requestPreparers = $factory->createRequestPreparers($logger, $config);
             } catch (RequestPreparerException $exception) {
                 $logger->warning("Can't create request preparers: {$exception}");
             } catch (RequestPreparerError $exception) {
