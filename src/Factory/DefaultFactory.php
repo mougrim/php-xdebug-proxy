@@ -49,7 +49,7 @@ class DefaultFactory implements Factory
     /**
      * {@inheritdoc}
      */
-    public function createRequestPreparers(LoggerInterface $logger): array
+    public function createRequestPreparers(LoggerInterface $logger, Config $config): array
     {
         return [];
     }

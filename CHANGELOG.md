@@ -4,9 +4,12 @@
 
 There are next changes:
 - next methods were added:
--- \Mougrim\XdebugProxy\Xml\XmlDocument::toArray
--- \Mougrim\XdebugProxy\Xml\XmlContainer::toArray
--- \Mougrim\XdebugProxy\Xml\XmlContainer::getAttribute
+  - `\Mougrim\XdebugProxy\Xml\XmlDocument::toArray()`
+  - `\Mougrim\XdebugProxy\Xml\XmlContainer::toArray()`
+  - `\Mougrim\XdebugProxy\Xml\XmlContainer::getAttribute()`
+- [config](softMocksConfig) for soft-mocks was added
+- parameter $config was added to method `\Mougrim\XdebugProxy\Factory\Factory::createRequestPreparers()`
+- now `\Mougrim\XdebugProxy\Factory\SoftMocksFactory::createConfig()` should return `\Mougrim\XdebugProxy\Config\SoftMocksConfig`
 
 ### v0.3.0
 

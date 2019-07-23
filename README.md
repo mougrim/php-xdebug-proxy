@@ -115,7 +115,22 @@ Good example of the request preparer is [`RequestPreparer\SoftMocksRequestPrepar
 
 ### Using with soft-mocks
 
-See doc in [soft-mocks](https://github.com/badoo/soft-mocks/#using-with-xdebug) project.
+For soft-mocks you can use [`softMocksConfig`](softMocksConfig) config directory:
+```bash
+bin/xdebug-proxy --configs=/path/to/php-xdebug-proxy/softMocksConfig
+```
+
+If you you want to provide path to custom `soft-mocks` init script, then copy [`softMocksConfig`](softMocksConfig) and change [`config.php`](softMocksConfig/config.php):
+```php
+...
+    'softMocks' => [
+        // if empty string, then vendor/badoo/soft-mocks/src/init_with_composer.php is used
+        'initScript' => '/your/custom/init-script.php',
+    ],
+...
+```
+
+For more information see doc in [soft-mocks](https://github.com/badoo/soft-mocks/#using-with-xdebug) project.
 
 ### Thanks
 

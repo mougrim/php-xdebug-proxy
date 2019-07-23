@@ -43,13 +43,14 @@ interface Factory
      * - on request to xdebug from last to first.
      *
      * @param LoggerInterface $logger
+     * @param Config $config
      *
      * @throws RequestPreparerException
      * @throws RequestPreparerError
      *
      * @return RequestPreparer[]
      */
-    public function createRequestPreparers(LoggerInterface $logger): array;
+    public function createRequestPreparers(LoggerInterface $logger, Config $config): array;
 
     public function createXdebugHandler(
         LoggerInterface $logger,
