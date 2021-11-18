@@ -1,6 +1,4 @@
-parameters:
-    git_dir: .
-    bin_dir: vendor/bin
+grumphp:
     hooks_dir: ~
     hooks_preset: local
     stop_on_failure: false
