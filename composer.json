@@ -3,7 +3,7 @@
     "description": "Xdebug (dbgp) proxy",
     "type": "project",
     "require": {
-        "php": ">=7.1",
+        "php": ">=8.0",
         "amphp/socket": "^0.10.8"
     },
     "require-dev": {
@@ -11,7 +11,7 @@
         "roave/security-advisories": "dev-master",
         "phpro/grumphp": "^1.5",
         "friendsofphp/php-cs-fixer": "^2.12.1",
-        "phpunit/phpunit": "^7.0",
+        "phpunit/phpunit": "^9.0",
         "amphp/log": "^1.0.0"
     },
     "license": "MIT",
