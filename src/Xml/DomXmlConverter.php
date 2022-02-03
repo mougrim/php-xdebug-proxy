@@ -32,6 +32,7 @@ use const LIBXML_NONET;
 use function count;
 use function error_clear_last;
 use function error_get_last;
+use function libxml_disable_entity_loader;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
@@ -93,7 +94,13 @@ class DomXmlConverter implements XmlConverter
     public function parse(string $xml): XmlDocument
     {
         $domDocument = new DOMDocument();
-        $result = @$domDocument->loadXML($xml, LIBXML_NONET);
+        if (\PHP_VERSION_ID < 80000) {
+            $oldDisableValue = libxml_disable_entity_loader();
+            $result = @$domDocument->loadXML($xml, LIBXML_NONET);
+            libxml_disable_entity_loader($oldDisableValue);
+        } else {
+            $result = @$domDocument->loadXML($xml, LIBXML_NONET);
+        }
         if (!$result) {
             $error = error_get_last();
             error_clear_last();
