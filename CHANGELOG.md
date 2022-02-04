@@ -4,6 +4,9 @@
 
 There are next changes:
 
+- Minimum PHP version supported upgraded to 7.4
+- PHPUnit version upgraded to 9
+
 ### [v0.4.1]
 
 There are next changes:
