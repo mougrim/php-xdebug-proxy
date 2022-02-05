@@ -4,15 +4,19 @@
 
 There are next changes:
 
-- Minimum PHP version supported upgraded to 7.4
-- PHPUnit version upgraded to 9
-- Add run unit tests Github action
-- Remove travis
-- Fix code style issues
-- Fix by workaround grumphp issue with TypeError, see [phpro/grumphp#957](https://github.com/phpro/grumphp/issues/957)
-- Update friendsofphp/php-cs-fixer to 3
-- Add psalm
-- Add check cs github action
+### [v0.5.0]
+
+There are next changes:
+
+- Minimum PHP version supported upgraded to 7.4 ([#29](https://github.com/mougrim/php-xdebug-proxy/pull/29))
+- PHPUnit version upgraded to 9 ([#29](https://github.com/mougrim/php-xdebug-proxy/pull/29))
+- Add run unit tests Github action ([#30](https://github.com/mougrim/php-xdebug-proxy/pull/30), [#31](https://github.com/mougrim/php-xdebug-proxy/pull/31))
+- Remove travis ([#30](https://github.com/mougrim/php-xdebug-proxy/pull/30))
+- Fix code style issues ([#32](https://github.com/mougrim/php-xdebug-proxy/pull/32))
+- Fix by workaround grumphp issue with TypeError, see [phpro/grumphp#957](https://github.com/phpro/grumphp/issues/957) ([#32](https://github.com/mougrim/php-xdebug-proxy/pull/32))
+- Update friendsofphp/php-cs-fixer to 3 ([#33](https://github.com/mougrim/php-xdebug-proxy/pull/33))
+- Add psalm ([#34](https://github.com/mougrim/php-xdebug-proxy/pull/34), [#35](https://github.com/mougrim/php-xdebug-proxy/pull/35))
+- Add check cs github action ([#36](https://github.com/mougrim/php-xdebug-proxy/pull/36))
 
 ### [v0.4.1]
 
@@ -70,7 +74,8 @@ There are next changes:
 - `\Mougrim\XdebugProxy\RequestPreparer\RequestPreparer` methods can throw `\Mougrim\XdebugProxy\RequestPreparer\Error` and `\Mougrim\XdebugProxy\RequestPreparer\Exception` if there is some problem ([#7](https://github.com/mougrim/php-xdebug-proxy/pull/7))
 - now `\Mougrim\XdebugProxy\Factory\Factory::createRequestPreparers()` accepts `$logger` param and also can throw `\Mougrim\XdebugProxy\RequestPreparer\Error` and `\Mougrim\XdebugProxy\RequestPreparer\Exception` if there is some problem ([#7](https://github.com/mougrim/php-xdebug-proxy/pull/7))
 
-[unreleased]: https://github.com/mougrim/php-xdebug-proxy/compare/0.4.1...HEAD
+[unreleased]: https://github.com/mougrim/php-xdebug-proxy/compare/0.5.0...HEAD
+[v0.5.0]: https://github.com/mougrim/php-xdebug-proxy/compare/0.4.1...0.5.0
 [v0.4.1]: https://github.com/mougrim/php-xdebug-proxy/compare/0.4.0...0.4.1
 [v0.4.0]: https://github.com/mougrim/php-xdebug-proxy/compare/0.3.0...0.4.0
 [v0.3.0]: https://github.com/mougrim/php-xdebug-proxy/compare/0.2.1...0.3.0
