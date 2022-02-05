@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Mougrim\XdebugProxy\Unit\Xml;
 
 use Monolog\Handler\NullHandler;
@@ -153,6 +155,14 @@ class DomXmlConverterTest extends TestCase
         $this->expectException(XmlParseException::class);
         $this->expectExceptionMessage("Can't parse xml");
         $converter->parse($xml);
+    }
+
+    public function testParseEmptyMessage(): void
+    {
+        $converter = new DomXmlConverter($this->createFakeLogger());
+        $this->expectException(XmlParseException::class);
+        $this->expectExceptionMessage("Can't parse xml");
+        $converter->parse('');
     }
 
     public function testNameValidate(): void

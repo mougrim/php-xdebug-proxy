@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mougrim\XdebugProxy\Xml;
 
 /**
@@ -7,12 +9,13 @@ namespace Mougrim\XdebugProxy\Xml;
  */
 class XmlContainer
 {
-    protected $name;
-    protected $attributes = [];
-    protected $content = '';
-    protected $isContentCdata = false;
+    protected string $name;
+    /** @var array<string, string> */
+    protected array $attributes = [];
+    protected string $content = '';
+    protected bool $isContentCdata = false;
     /** @var XmlContainer[] */
-    protected $children = [];
+    protected array $children = [];
 
     public function __construct(string $name)
     {
@@ -30,7 +33,7 @@ class XmlContainer
     }
 
     /**
-     * @return string[]
+     * @return array<string, string>
      */
     public function getAttributes(): array
     {
@@ -48,7 +51,7 @@ class XmlContainer
     }
 
     /**
-     * @param string[] $attributes
+     * @param array<string, string> $attributes
      *
      * @return $this
      */

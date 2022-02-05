@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mougrim\XdebugProxy\Handler;
 
 use Amp\Socket\ServerSocket;

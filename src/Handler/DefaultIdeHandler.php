@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mougrim\XdebugProxy\Handler;
 
 use Amp\ByteStream\ClosedException;
@@ -36,17 +38,19 @@ use function strpos;
  */
 class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
 {
-    protected $logger;
-    protected $config;
-    protected $xmlConverter;
-    protected $requestPreparers;
-    protected $defaultIde;
-    protected $ideList = [];
+    protected LoggerInterface $logger;
+    protected IdeServerConfig $config;
+    protected XmlConverter $xmlConverter;
+    /** @var RequestPreparer[] */
+    protected array $requestPreparers;
+    protected string $defaultIde;
+    /** @var array<string, string> */
+    protected array $ideList = [];
     /**
-     * @var ServerSocket[]|SplObjectStorage
+     * @var SplObjectStorage<ServerSocket, ClientSocket>
      */
-    protected $ideSockets;
-    protected $maxIdeSockets = 100;
+    protected SplObjectStorage $ideSockets;
+    protected int $maxIdeSockets = 100;
 
     /**
      * @param RequestPreparer[] $requestPreparers
@@ -94,7 +98,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
 
     public function handle(ServerSocket $socket): Generator
     {
-        [$ip, $port] = explode(':', $socket->getRemoteAddress());
+        [$ip, $port] = explode(':', (string) $socket->getRemoteAddress());
         $baseContext = [
             'ide' => "{$ip}:{$port}",
         ];
@@ -152,6 +156,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                             '[IdeRegistration] Missing required arguments.',
                             $context + ['missingRequiredArguments' => $missingRequiredArguments]
                         );
+                        /** @psalm-suppress MixedArgument */
                         throw new IdeRegistrationException(
                             static::REGISTRATION_ERROR_MISSING_REQUIRED_ARGUMENTS,
                             'Next required arguments are missing: '.implode(', ', $missingRequiredArguments),
@@ -168,6 +173,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                                 '[IdeRegistration] Port should be a number.',
                                 $context + ['port' => $arguments['-p']]
                             );
+                            /** @psalm-suppress MixedArgument */
                             throw new IdeRegistrationException(
                                 static::REGISTRATION_ERROR_ARGUMENT_FORMAT,
                                 'Port should be a number',
@@ -213,11 +219,11 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                         break;
                     default:
                         $this->logger->error('[IdeRegistration] Unknown command from IDE.', $context);
+                        /** @psalm-suppress MixedArgument */
                         throw new IdeRegistrationException(
                             static::REGISTRATION_ERROR_UNKNOWN_COMMAND,
                             "Unknown command '{$command}'"
                         );
-                        break;
                 }
             } catch (IdeRegistrationException $exception) {
                 $xmlContainerMessage = (new XmlContainer('message'))
@@ -229,6 +235,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                     ->addAttribute('success', '0')
                     ->addChild($xmlContainerError);
             }
+            /** @psalm-suppress PossiblyUndefinedVariable */
             $xmlDocument = (new XmlDocument('1.0', 'UTF-8'))
                 ->setRoot($xmlContainer);
             try {
@@ -277,6 +284,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         }
         /** @var ClientSocket $ideSocket */
         $ideSocket = $this->ideSockets->offsetGet($xdebugSocket);
+        /** @psalm-suppress MixedAssignment */
         $context['ide'] = $ideSocket->getRemoteAddress();
         try {
             $this->prepareRequestToIde($xmlRequest, $rawRequest, $context);
@@ -347,15 +355,16 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
             'xdebug' => $xdebugSocket->getRemoteAddress(),
             'request' => $rawRequest,
         ];
-        if (!$xmlRequest->getRoot()) {
+        $xmlContainer = $xmlRequest->getRoot();
+        if (!$xmlContainer) {
             throw new FromXdebugProcessError("Can't get document root", $context);
         }
 
-        if ($xmlRequest->getRoot()->getName() !== 'init') {
+        if ($xmlContainer->getName() !== 'init') {
             throw new FromXdebugProcessError("First request's root should be init", $context);
         }
 
-        $ideKey = $xmlRequest->getRoot()->getAttributes()['idekey'] ?? null;
+        $ideKey = $xmlContainer->getAttributes()['idekey'] ?? null;
         if (!$ideKey) {
             throw new FromXdebugProcessError('Ide key is empty', $context);
         }
@@ -469,6 +478,9 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         return [$command, $arguments];
     }
 
+    /**
+     * @param array<string, string> $arguments
+     */
     public function buildCommand(string $command, array $arguments): string
     {
         $argumentStrings = [];
@@ -479,6 +491,9 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         return $command.' '.implode(' ', $argumentStrings);
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function parseArguments(string $arguments): array
     {
         $context = [
@@ -486,6 +501,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         ];
         $parts = explode(' ', $arguments);
         $partsQty = count($parts);
+        /** @var array<string, string> $result */
         $result = [];
         /** @noinspection ForeachInvariantsInspection */
         for ($i = 0; $i < $partsQty; $i++) {
