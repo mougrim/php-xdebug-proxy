@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mougrim\XdebugProxy\Factory;
 
 use Mougrim\XdebugProxy\Config\Config;
@@ -18,6 +20,9 @@ use Psr\Log\LoggerInterface;
  */
 interface Factory
 {
+    /**
+     * @param array<array-key, array> $config
+     */
     public function createConfig(array $config): Config;
 
     public function createXmlConverter(LoggerInterface $logger): XmlConverter;

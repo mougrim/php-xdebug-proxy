@@ -10,4 +10,8 @@ grumphp:
             config: .php-cs-fixer.php
         psalm:
             config: psalm.xml
+            no_cache: true
+            show_info: true
+            ignore_patterns:
+                - tests/
     extensions: []

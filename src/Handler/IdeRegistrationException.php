@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mougrim\XdebugProxy\Handler;
 
 use Exception;
@@ -9,7 +11,7 @@ use Exception;
  */
 class IdeRegistrationException extends Exception
 {
-    protected $command;
+    protected string $command;
 
     public function __construct(int $error_id, string $message, string $command = 'proxyerror')
     {

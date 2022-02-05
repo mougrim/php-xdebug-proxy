@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mougrim\XdebugProxy\Handler;
 
 use Exception as BaseException;
@@ -10,7 +12,7 @@ use Throwable;
  */
 class Exception extends BaseException
 {
-    protected $context;
+    protected array $context;
 
     public function __construct(string $message, array $context = [], Throwable $previous = null)
     {

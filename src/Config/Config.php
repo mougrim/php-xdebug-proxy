@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mougrim\XdebugProxy\Config;
 
 /**
@@ -22,11 +24,17 @@ class Config
         ],
     ];
 
-    protected $config;
-    protected $xdebugServer;
-    protected $ideRegistrationServer;
-    protected $ideServer;
+    /** @var array<array-key, array> */
+    protected array $config;
+    protected Server $xdebugServer;
+    protected Server $ideRegistrationServer;
+    protected IdeServer $ideServer;
 
+    /**
+     * @param array<array-key, array> $config
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedArgumentTypeCoercion
+     */
     public function __construct(array $config)
     {
         $this->config = $config;

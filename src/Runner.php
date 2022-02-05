@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mougrim\XdebugProxy;
 
 use Mougrim\XdebugProxy\Config\Config;
@@ -91,12 +93,22 @@ class Runner
         $this->end($exitCode);
     }
 
+    /**
+     * @psalm-suppress MoreSpecificReturnType
+     * @psalm-suppress LessSpecificReturnStatement
+     * @psalm-suppress InvalidReturnType
+     * @psalm-suppress InvalidReturnStatement
+     * @psalm-suppress MixedAssignment
+     *
+     * @return array{configs: string|null, help: bool|null}
+     */
     protected function getOptions(): array
     {
         $shortToLongOptions = [
             'c' => 'configs',
             'h' => 'help',
         ];
+        /** @var array $rawOptions */
         $rawOptions = getopt('c:h', ['configs:', 'help']);
         $result = [];
         foreach ($shortToLongOptions as $shortOption => $longOption) {
@@ -110,6 +122,9 @@ class Runner
         return $result;
     }
 
+    /**
+     * @param array{configs: string|null} $options
+     */
     protected function getConfigsPath(array $options): string
     {
         $configPath = $options['configs'] ?? __DIR__.'/../config';
@@ -125,12 +140,12 @@ class Runner
     protected function getConfig(string $configsPath, Factory $factory): Config
     {
         $configPath = $configsPath.'/config.php';
-        /** @var array $config */
         $config = $this->requireConfig($configPath);
         if (!is_array($config)) {
             throw new RunError("Config '{$configPath}' should return array.");
         }
 
+        /** @psalm-suppress MixedArgumentTypeCoercion */
         return $factory->createConfig($config);
     }
 
@@ -158,6 +173,9 @@ class Runner
         return $logger;
     }
 
+    /**
+     * @return mixed
+     */
     protected function requireConfig(string $path)
     {
         if (!is_file($path) || !is_readable($path)) {
@@ -167,8 +185,10 @@ class Runner
         return require $path;
     }
 
+    /** @psalm-suppress MixedInferredReturnType */
     public function getScriptName(): string
     {
+        /** @psalm-suppress MixedReturnStatement */
         return $_SERVER['argv'][0] ?? 'xdebug-proxy';
     }
 

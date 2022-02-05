@@ -10,7 +10,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install dependencies
+        run: composer install
+
       - name: Psalm
-        uses: docker://vimeo/psalm-github-actions
-        with:
-          composer_require_dev: true
+        run: vendor/bin/psalm --output-format=github

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /** @noinspection PhpComposerExtensionStubsInspection ext-dom is declared as suggest */
 
 namespace Mougrim\XdebugProxy\Xml;
@@ -89,12 +91,17 @@ class DomXmlConverter implements XmlConverter
      */
     public function parse(string $xml): XmlDocument
     {
+        if (!$xml) {
+            throw new XmlParseException("Can't parse xml: xml must not be empty");
+        }
         $domDocument = new DOMDocument();
         if (\PHP_VERSION_ID < 80000) {
             $oldDisableValue = libxml_disable_entity_loader();
+            /** @psalm-suppress ArgumentTypeCoercion */
             $result = @$domDocument->loadXML($xml, LIBXML_NONET);
             libxml_disable_entity_loader($oldDisableValue);
         } else {
+            /** @psalm-suppress ArgumentTypeCoercion */
             $result = @$domDocument->loadXML($xml, LIBXML_NONET);
         }
         if (!$result) {
@@ -141,7 +148,7 @@ class DomXmlConverter implements XmlConverter
                 if (!$domElement->hasAttribute($node->nodeName)) {
                     continue;
                 }
-                $container->addAttribute($node->nodeName, $node->nodeValue);
+                $container->addAttribute($node->nodeName, $node->nodeValue ?? '');
             }
         }
         $content = '';
@@ -152,7 +159,7 @@ class DomXmlConverter implements XmlConverter
                 if ($child instanceof DOMCdataSection) {
                     $container->setIsContentCdata(true);
                 }
-                $content .= $child->nodeValue;
+                $content .= ($child->nodeValue ?? '');
             } elseif ($child instanceof DOMEntityReference) {
                 throw new XmlParseException('Xml should be without entity ref nodes');
             } else {
@@ -175,9 +182,10 @@ class DomXmlConverter implements XmlConverter
     public function generate(XmlDocument $document): string
     {
         try {
-            $domDocument = new DOMDocument($document->getVersion(), $document->getEncoding());
-            if ($document->getRoot()) {
-                $domElement = $this->toDomElement($domDocument, $document->getRoot());
+            $domDocument = new DOMDocument($document->getVersion(), $document->getEncoding() ?? '');
+            $xmlContainer = $document->getRoot();
+            if ($xmlContainer) {
+                $domElement = $this->toDomElement($domDocument, $xmlContainer);
                 $domDocument->appendChild($domElement);
             }
 

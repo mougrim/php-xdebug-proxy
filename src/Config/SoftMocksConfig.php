@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mougrim\XdebugProxy\Config;
 
 /**
@@ -11,8 +13,13 @@ class SoftMocksConfig extends Config
         'initScript' => '',
     ];
 
-    protected $softMocks;
+    protected SoftMocks $softMocks;
 
+    /**
+     * @param array<array-key, array> $config
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedArgumentTypeCoercion
+     */
     public function __construct(array $config)
     {
         parent::__construct($config);

@@ -1,12 +1,15 @@
 <?php
+
+declare(strict_types=1);
+
 use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
-use PhpCsFixer\Fixer\Import\OrderedImportsFixer;
 
 return (new Config())
     ->setRiskyAllowed(true)
     ->setRules([
         '@Symfony' => true,
+        'declare_strict_types' => true,
         'ordered_imports' => [
             'imports_order' => [
                 'class',

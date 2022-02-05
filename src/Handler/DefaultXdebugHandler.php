@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mougrim\XdebugProxy\Handler;
 
 use Amp\ByteStream\ClosedException;
@@ -18,13 +20,13 @@ use function substr_count;
  */
 class DefaultXdebugHandler implements XdebugHandler
 {
-    protected $logger;
-    protected $xmlConverter;
-    protected $ideHandler;
+    protected LoggerInterface $logger;
+    protected XmlConverter $xmlConverter;
+    protected IdeHandler $ideHandler;
     /**
-     * @var string[]|SplObjectStorage
+     * @var SplObjectStorage<ServerSocket, string>
      */
-    protected $requestBuffers;
+    protected SplObjectStorage $requestBuffers;
 
     public function __construct(LoggerInterface $logger, XmlConverter $xmlConverter, IdeHandler $ideHandler)
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mougrim\XdebugProxy\Handler;
 
 /**
@@ -12,5 +14,8 @@ interface CommandToXdebugParser
      */
     public function parseCommand(string $request): array;
 
+    /**
+     * @param array<string, string> $arguments
+     */
     public function buildCommand(string $command, array $arguments): string;
 }

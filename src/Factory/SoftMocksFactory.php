@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mougrim\XdebugProxy\Factory;
 
 use Mougrim\XdebugProxy\Config\Config;
@@ -19,6 +21,8 @@ class SoftMocksFactory extends DefaultFactory
     /**
      * @noinspection PhpMissingParentCallCommonInspection
      * {@inheritdoc}
+     *
+     * @param array<array-key, array> $config
      *
      * @return SoftMocksConfig
      */

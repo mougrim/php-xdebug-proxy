@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mougrim\XdebugProxy\RequestPreparer;
 
 // Badoo\SoftMocks is optional for xdebug-proxy
@@ -23,7 +25,7 @@ use function realpath;
  */
 class SoftMocksRequestPreparer implements RequestPreparer
 {
-    protected $logger;
+    protected LoggerInterface $logger;
 
     /**
      * @param string $initScript
@@ -53,7 +55,10 @@ class SoftMocksRequestPreparer implements RequestPreparer
         if (!$initScript) {
             throw new Error("Can't find soft-mocks init script");
         }
-        /** @noinspection PhpIncludeInspection */
+        /**
+         * @psalm-suppress UnresolvableInclude
+         * @noinspection PhpIncludeInspection
+         */
         require $initScript;
     }
 
@@ -85,6 +90,7 @@ class SoftMocksRequestPreparer implements RequestPreparer
     {
         // workaround some symbols like '+' are encoded like %2B
         $file = rawurldecode($file);
+        /** @var array|false $parts */
         $parts = parse_url($file);
         if ($parts === false) {
             $this->logger->warning("Can't parse file '{$file}'", $context);
@@ -139,7 +145,7 @@ class SoftMocksRequestPreparer implements RequestPreparer
 
             return '';
         }
-        if ($parts['scheme'] !== 'file') {
+        if (($parts['scheme'] ?? '') !== 'file') {
             $this->logger->warning("Scheme isn't file '{$file}'", $context);
 
             return '';
