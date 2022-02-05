@@ -30,12 +30,7 @@ class DefaultFactory implements Factory
     }
 
     /**
-     * @param LoggerInterface $logger
-     * @param IdeServerConfig $config
-     * @param XmlConverter $xmlConverter
      * @param RequestPreparer[] $requestPreparers
-     *
-     * @return IdeHandler
      */
     public function createIdeHandler(
         LoggerInterface $logger,

@@ -49,9 +49,6 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
     protected $maxIdeSockets = 100;
 
     /**
-     * @param LoggerInterface $logger
-     * @param IdeServerConfig $config
-     * @param XmlConverter $xmlConverter
      * @param RequestPreparer[] $requestPreparers
      */
     public function __construct(
@@ -81,8 +78,6 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
     }
 
     /**
-     * @param int $maxIdeSockets
-     *
      * @return $this
      */
     public function setMaxIdeSockets(int $maxIdeSockets): DefaultIdeHandler
@@ -97,11 +92,6 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         return $this->ideList;
     }
 
-    /**
-     * @param ServerSocket $socket
-     *
-     * @return Generator
-     */
     public function handle(ServerSocket $socket): Generator
     {
         [$ip, $port] = explode(':', $socket->getRemoteAddress());
@@ -273,14 +263,8 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
     }
 
     /**
-     * @param XmlDocument $xmlRequest
-     * @param string $rawRequest
-     * @param ServerSocket $xdebugSocket
-     *
      * @throws FromXdebugProcessError
      * @throws FromXdebugProcessException
-     *
-     * @return Generator
      */
     public function processRequest(XmlDocument $xmlRequest, string $rawRequest, ServerSocket $xdebugSocket): Generator
     {
@@ -319,13 +303,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
     }
 
     /**
-     * @param XmlDocument $xmlRequest
-     * @param string $rawRequest
-     * @param array $context
-     *
      * @throws RequestPreparerError
-     *
-     * @return void
      */
     protected function prepareRequestToIde(XmlDocument $xmlRequest, string $rawRequest, array $context): void
     {
@@ -360,14 +338,8 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
     }
 
     /**
-     * @param XmlDocument $xmlRequest
-     * @param string $rawRequest
-     * @param ServerSocket $xdebugSocket
-     *
      * @throws FromXdebugProcessError
      * @throws FromXdebugProcessException
-     *
-     * @return Generator
      */
     protected function processInit(XmlDocument $xmlRequest, string $rawRequest, ServerSocket $xdebugSocket): Generator
     {
@@ -466,9 +438,6 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
     }
 
     /**
-     * @param string $request
-     * @param array $context
-     *
      * @throws RequestPreparerError
      *
      * @return string prepared request

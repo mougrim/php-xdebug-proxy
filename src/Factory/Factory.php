@@ -23,12 +23,7 @@ interface Factory
     public function createXmlConverter(LoggerInterface $logger): XmlConverter;
 
     /**
-     * @param LoggerInterface $logger
-     * @param IdeServerConfig $config
-     * @param XmlConverter $xmlConverter
      * @param RequestPreparer[] $requestPreparers
-     *
-     * @return IdeHandler
      */
     public function createIdeHandler(
         LoggerInterface $logger,
@@ -41,9 +36,6 @@ interface Factory
      * Request preparers will be called:
      * - on request to ide from first to last;
      * - on request to xdebug from last to first.
-     *
-     * @param LoggerInterface $logger
-     * @param Config $config
      *
      * @throws RequestPreparerException
      * @throws RequestPreparerError

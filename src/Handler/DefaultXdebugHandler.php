@@ -34,11 +34,6 @@ class DefaultXdebugHandler implements XdebugHandler
         $this->requestBuffers = new SplObjectStorage();
     }
 
-    /**
-     * @param ServerSocket $socket
-     *
-     * @return Generator
-     */
     public function handle(ServerSocket $socket): Generator
     {
         $baseContext = [

@@ -3,13 +3,13 @@ use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
 use PhpCsFixer\Fixer\Import\OrderedImportsFixer;
 
-return Config::create()
+return (new Config())
     ->setRiskyAllowed(true)
     ->setRules([
         '@Symfony' => true,
         'array_syntax' => ['syntax' => 'short'],
         'ordered_imports' => [
-            'importsOrder' => [
+            'imports_order' => [
                 OrderedImportsFixer::IMPORT_TYPE_CLASS,
                 OrderedImportsFixer::IMPORT_TYPE_CONST,
                 OrderedImportsFixer::IMPORT_TYPE_FUNCTION,
@@ -22,7 +22,7 @@ return Config::create()
         'dir_constant' => true,
         'ereg_to_preg' => true,
         'modernize_types_casting' => true,
-        'no_multiline_whitespace_before_semicolons' => true,
+        'multiline_whitespace_before_semicolons' => false,
         'no_php4_constructor' => true,
         'no_useless_else' => true,
         'no_useless_return' => true,
@@ -34,6 +34,7 @@ return Config::create()
         'yoda_style' => false,
         'increment_style' => false,
         'phpdoc_no_empty_return' => false,
+        'single_line_throw' => false,
     ])
     ->setFinder(
         Finder::create()

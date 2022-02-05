@@ -32,14 +32,8 @@ interface IdeHandler extends Handler
     public function getIdeList(): array;
 
     /**
-     * @param XmlDocument $xmlRequest
-     * @param string $rawRequest
-     * @param ServerSocket $xdebugSocket
-     *
      * @throws FromXdebugProcessError
      * @throws FromXdebugProcessException
-     *
-     * @return Generator
      */
     public function processRequest(XmlDocument $xmlRequest, string $rawRequest, ServerSocket $xdebugSocket): Generator;
 
