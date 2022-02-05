@@ -94,9 +94,13 @@ class DomXmlConverter implements XmlConverter
     public function parse(string $xml): XmlDocument
     {
         $domDocument = new DOMDocument();
-        $oldDisableValue = libxml_disable_entity_loader();
-        $result = @$domDocument->loadXML($xml, LIBXML_NONET);
-        libxml_disable_entity_loader($oldDisableValue);
+        if (\PHP_VERSION_ID < 80000) {
+            $oldDisableValue = libxml_disable_entity_loader();
+            $result = @$domDocument->loadXML($xml, LIBXML_NONET);
+            libxml_disable_entity_loader($oldDisableValue);
+        } else {
+            $result = @$domDocument->loadXML($xml, LIBXML_NONET);
+        }
         if (!$result) {
             $error = error_get_last();
             error_clear_last();
@@ -163,7 +167,7 @@ class DomXmlConverter implements XmlConverter
             }
         }
         $content = '';
-        foreach ($domElement->childNodes as /** @var DOMNode $child */$child) {
+        foreach ($domElement->childNodes as /** @var DOMNode $child */ $child) {
             if ($child instanceof DOMElement) {
                 $container->addChild($this->toContainer($domDocument, $child));
             } elseif ($child instanceof DOMText) {
