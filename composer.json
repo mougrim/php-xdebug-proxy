@@ -35,5 +35,10 @@
     "suggest": {
         "ext-dom": "Required for parse XML by default",
         "amphp/log": "Required for write logs by default"
+    },
+    "config": {
+        "allow-plugins": {
+            "phpro/grumphp": true
+        }
     }
 }

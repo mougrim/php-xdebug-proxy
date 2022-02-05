@@ -6,6 +6,8 @@ There are next changes:
 
 - Minimum PHP version supported upgraded to 7.4
 - PHPUnit version upgraded to 9
+- Add run unit tests Github action
+- Remove travis
 
 ### [v0.4.1]
 
