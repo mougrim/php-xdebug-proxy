@@ -7,16 +7,13 @@ return (new Config())
     ->setRiskyAllowed(true)
     ->setRules([
         '@Symfony' => true,
-        'array_syntax' => ['syntax' => 'short'],
         'ordered_imports' => [
             'imports_order' => [
-                OrderedImportsFixer::IMPORT_TYPE_CLASS,
-                OrderedImportsFixer::IMPORT_TYPE_CONST,
-                OrderedImportsFixer::IMPORT_TYPE_FUNCTION,
+                'class',
+                'const',
+                'function',
             ],
         ],
-        'php_unit_construct' => true,
-        'php_unit_strict' => true,
         'strict_comparison' => true,
         'combine_consecutive_unsets' => true,
         'dir_constant' => true,
