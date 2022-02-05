@@ -9,7 +9,7 @@ The main benefit is that this proxy is written in php - the language you know.
 [![Latest Stable Version](https://poser.pugx.org/mougrim/php-xdebug-proxy/version)](https://packagist.org/packages/mougrim/php-xdebug-proxy)
 [![Latest Unstable Version](https://poser.pugx.org/mougrim/php-xdebug-proxy/v/unstable)](https://packagist.org/packages/mougrim/php-xdebug-proxy)
 [![License](https://poser.pugx.org/mougrim/php-xdebug-proxy/license)](https://packagist.org/packages/mougrim/php-xdebug-proxy)
-[![Build Status](https://api.travis-ci.org/mougrim/php-xdebug-proxy.png?branch=master)](https://travis-ci.org/mougrim/php-xdebug-proxy)
+[![CI Status](https://github.com/mougrim/php-xdebug-proxy/workflows/CI/badge.svg?branch=master&event=push)](https://github.com/mougrim/php-xdebug-proxy/actions?query=branch%3Amaster)
 
 ### Installation
 
