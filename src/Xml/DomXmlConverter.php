@@ -122,16 +122,7 @@ class DomXmlConverter implements XmlConverter
         }
 
         if ($domDocument->documentElement) {
-            if ($domDocument->documentElement instanceof DOMElement) {
-                $document->setRoot($this->toContainer($domDocument, $domDocument->documentElement));
-            } else {
-                $this->logger->warning(
-                    "Unknown document child node type {$domDocument->documentElement->nodeType}, skip it",
-                    [
-                        'xml' => $domDocument->saveXML(),
-                    ]
-                );
-            }
+            $document->setRoot($this->toContainer($domDocument, $domDocument->documentElement));
         }
 
         return $document;
