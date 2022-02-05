@@ -8,11 +8,14 @@
     },
     "require-dev": {
         "ext-dom": "*",
-        "roave/security-advisories": "dev-master",
+        "roave/security-advisories": "dev-latest",
         "phpro/grumphp": "^1.5",
         "friendsofphp/php-cs-fixer": "^2.12.1",
         "phpunit/phpunit": "^9.0",
         "amphp/log": "^1.0.0"
+    },
+    "conflict": {
+        "amphp/parallel-functions": "=1.1.0"
     },
     "license": "MIT",
     "authors": [

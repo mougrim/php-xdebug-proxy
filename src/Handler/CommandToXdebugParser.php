@@ -8,17 +8,9 @@ namespace Mougrim\XdebugProxy\Handler;
 interface CommandToXdebugParser
 {
     /**
-     * @param string $request
-     *
-     * @return array [$command, $arguments]
+     * @return array{0: string, 1: array<string, string>} [$command, $arguments]
      */
     public function parseCommand(string $request): array;
 
-    /**
-     * @param string $command
-     * @param array $arguments
-     *
-     * @return string
-     */
     public function buildCommand(string $command, array $arguments): string;
 }

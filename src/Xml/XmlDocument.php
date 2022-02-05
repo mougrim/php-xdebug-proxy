@@ -34,8 +34,6 @@ class XmlDocument
     }
 
     /**
-     * @param XmlContainer $root
-     *
      * @return $this
      */
     public function setRoot(XmlContainer $root): XmlDocument

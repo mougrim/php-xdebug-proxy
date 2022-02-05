@@ -38,9 +38,6 @@ class XmlContainer
     }
 
     /**
-     * @param string $name
-     * @param string $value
-     *
      * @return $this
      */
     public function addAttribute(string $name, string $value): XmlContainer
@@ -68,8 +65,6 @@ class XmlContainer
     }
 
     /**
-     * @param string $content
-     *
      * @return $this
      */
     public function setContent(string $content): XmlContainer
@@ -85,8 +80,6 @@ class XmlContainer
     }
 
     /**
-     * @param bool $isContentCdata
-     *
      * @return $this
      */
     public function setIsContentCdata(bool $isContentCdata): XmlContainer
@@ -105,8 +98,6 @@ class XmlContainer
     }
 
     /**
-     * @param XmlContainer $child
-     *
      * @return $this
      */
     public function addChild(XmlContainer $child): XmlContainer

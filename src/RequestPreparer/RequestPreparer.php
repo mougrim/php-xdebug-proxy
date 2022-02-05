@@ -19,8 +19,6 @@ interface RequestPreparer
      *
      * @throws Exception
      * @throws Error
-     *
-     * @return void
      */
     public function prepareRequestToIde(XmlDocument $xmlRequest, string $rawRequest): void;
 
@@ -29,12 +27,9 @@ interface RequestPreparer
      * Use $commandToXdebugParser to parse the command in request and to rebuild the command.
      *
      * @param string $request command from ide to xdebug
-     * @param CommandToXdebugParser $commandToXdebugParser
      *
      * @throws Exception
      * @throws Error
-     *
-     * @return string
      */
     public function prepareRequestToXdebug(string $request, CommandToXdebugParser $commandToXdebugParser): string;
 }

@@ -8,6 +8,8 @@ There are next changes:
 - PHPUnit version upgraded to 9
 - Add run unit tests Github action
 - Remove travis
+- Fix code style issues
+- Fix by workaround grumphp issue with TypeError, see [phpro/grumphp#957](https://github.com/phpro/grumphp/issues/957)
 
 ### [v0.4.1]
 

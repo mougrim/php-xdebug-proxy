@@ -85,11 +85,7 @@ class DomXmlConverter implements XmlConverter
     }
 
     /**
-     * @param string $xml
-     *
      * @throws XmlException
-     *
-     * @return XmlDocument
      */
     public function parse(string $xml): XmlDocument
     {
@@ -115,11 +111,7 @@ class DomXmlConverter implements XmlConverter
     }
 
     /**
-     * @param DOMDocument $domDocument
-     *
      * @throws XmlParseException
-     *
-     * @return XmlDocument
      */
     protected function toDocument(DOMDocument $domDocument): XmlDocument
     {
@@ -146,12 +138,7 @@ class DomXmlConverter implements XmlConverter
     }
 
     /**
-     * @param DOMDocument $domDocument
-     * @param DOMElement $domElement
-     *
      * @throws XmlParseException
-     *
-     * @return XmlContainer
      */
     protected function toContainer(DOMDocument $domDocument, DOMElement $domElement): XmlContainer
     {
@@ -192,11 +179,7 @@ class DomXmlConverter implements XmlConverter
     }
 
     /**
-     * @param XmlDocument $document
-     *
      * @throws XmlException
-     *
-     * @return string
      */
     public function generate(XmlDocument $document): string
     {

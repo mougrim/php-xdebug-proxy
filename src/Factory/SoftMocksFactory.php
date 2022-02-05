@@ -20,8 +20,6 @@ class SoftMocksFactory extends DefaultFactory
      * @noinspection PhpMissingParentCallCommonInspection
      * {@inheritdoc}
      *
-     * @param array $config
-     *
      * @return SoftMocksConfig
      */
     public function createConfig(array $config): Config
@@ -32,7 +30,6 @@ class SoftMocksFactory extends DefaultFactory
     /**
      * {@inheritdoc}
      *
-     * @param LoggerInterface $logger
      * @param SoftMocksConfig $config
      *
      * @throws RequestPreparerException
@@ -48,12 +45,7 @@ class SoftMocksFactory extends DefaultFactory
     }
 
     /**
-     * @param LoggerInterface $logger
-     * @param SoftMocksConfig $config
-     *
      * @throws RequestPreparerError
-     *
-     * @return SoftMocksRequestPreparer
      */
     public function createSoftMocksRequestPreparer(LoggerInterface $logger, SoftMocksConfig $config): SoftMocksRequestPreparer
     {

@@ -25,7 +25,6 @@ class SoftMocksRequestPreparer implements RequestPreparer
     protected $logger;
 
     /**
-     * @param LoggerInterface $logger
      * @param string $initScript
      *
      * @throws Error
