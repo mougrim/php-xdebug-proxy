@@ -12,6 +12,7 @@ There are next changes:
 - Fix by workaround grumphp issue with TypeError, see [phpro/grumphp#957](https://github.com/phpro/grumphp/issues/957)
 - Update friendsofphp/php-cs-fixer to 3
 - Add psalm
+- Add check cs github action
 
 ### [v0.4.1]
 

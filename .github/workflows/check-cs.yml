@@ -1,0 +1,17 @@
+name: Check coding standards
+
+on: [push, pull_request]
+
+jobs:
+  psalm:
+    name: Check coding standards
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: PHP CS Fixer
+        run: vendor/bin/php-cs-fixer --allow-risky=yes --config=.php-cs-fixer.php --verbose fix --dry-run --diff
