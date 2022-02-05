@@ -8,4 +8,6 @@ grumphp:
         phpcsfixer2:
             allow_risky: true
             config: .php-cs-fixer.php
+        psalm:
+            config: psalm.xml
     extensions: []

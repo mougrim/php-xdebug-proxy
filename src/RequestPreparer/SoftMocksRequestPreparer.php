@@ -19,6 +19,7 @@ use function realpath;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
+ * @psalm-suppress UndefinedClass
  */
 class SoftMocksRequestPreparer implements RequestPreparer
 {

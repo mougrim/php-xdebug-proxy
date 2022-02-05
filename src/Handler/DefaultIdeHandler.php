@@ -178,7 +178,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                         $context['ide'] = $newIde;
                         if (isset($this->ideList[$arguments['-k']])) {
                             $this->logger->notice(
-                                "[IdeRegistration] Change ide from '{$this->ideList[$arguments['-k']]}' to '{$newIde}'".
+                                "[IdeRegistration] Change ide from '{$this->ideList[$arguments['-k']]}' to '{$newIde}'",
                                 $context
                             );
                         } else {
@@ -189,7 +189,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                         }
                         $this->ideList[$arguments['-k']] = $newIde;
                         $xmlContainer = (new XmlContainer('proxyinit'))
-                            ->addAttribute('success', 1)
+                            ->addAttribute('success', '1')
                             ->addAttribute('idekey', $arguments['-k'])
                             ->addAttribute('address', $ip)
                             ->addAttribute('port', $arguments['-p']);
@@ -208,7 +208,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                             );
                         }
                         $xmlContainer = (new XmlContainer('proxystop'))
-                            ->addAttribute('success', 1)
+                            ->addAttribute('success', '1')
                             ->addAttribute('idekey', $arguments['-k']);
                         break;
                     default:
@@ -223,10 +223,10 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                 $xmlContainerMessage = (new XmlContainer('message'))
                     ->setContent($exception->getMessage());
                 $xmlContainerError = (new XmlContainer('error'))
-                    ->addAttribute('id', $exception->getErrorId())
+                    ->addAttribute('id', (string) $exception->getErrorId())
                     ->addChild($xmlContainerMessage);
                 $xmlContainer = (new XmlContainer($exception->getCommand()))
-                    ->addAttribute('success', 0)
+                    ->addAttribute('success', '0')
                     ->addChild($xmlContainerError);
             }
             $xmlDocument = (new XmlDocument('1.0', 'UTF-8'))

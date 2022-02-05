@@ -12,7 +12,8 @@
         "phpro/grumphp": "^1.5",
         "friendsofphp/php-cs-fixer": "^3.5",
         "phpunit/phpunit": "^9.0",
-        "amphp/log": "^1.0.0"
+        "amphp/log": "^1.0.0",
+        "vimeo/psalm": "^4.20"
     },
     "conflict": {
         "amphp/parallel-functions": "=1.1.0"

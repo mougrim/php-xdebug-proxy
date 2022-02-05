@@ -30,6 +30,8 @@ class SoftMocksFactory extends DefaultFactory
     /**
      * {@inheritdoc}
      *
+     * @psalm-suppress MoreSpecificImplementedParamType
+     *
      * @param SoftMocksConfig $config
      *
      * @throws RequestPreparerException
