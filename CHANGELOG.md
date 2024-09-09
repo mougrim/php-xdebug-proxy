@@ -4,6 +4,8 @@
 
 There are next changes:
 
+- Bump actions/download-artifact from 2 to 4.1.7 in /.github/workflows ([#41](https://github.com/mougrim/php-xdebug-proxy/pull/41))
+
 ### [v0.5.0]
 
 There are next changes:
