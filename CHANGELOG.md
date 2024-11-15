@@ -4,7 +4,12 @@
 
 There are next changes:
 
+### [v0.5.1]
+
+There are next changes:
+
 - Bump actions/download-artifact from 2 to 4.1.7 in /.github/workflows ([#41](https://github.com/mougrim/php-xdebug-proxy/pull/41))
+- Bump symfony/process from 5.4.3 to 5.4.46 ([#42](https://github.com/mougrim/php-xdebug-proxy/pull/42))
 
 ### [v0.5.0]
 
@@ -76,7 +81,8 @@ There are next changes:
 - `\Mougrim\XdebugProxy\RequestPreparer\RequestPreparer` methods can throw `\Mougrim\XdebugProxy\RequestPreparer\Error` and `\Mougrim\XdebugProxy\RequestPreparer\Exception` if there is some problem ([#7](https://github.com/mougrim/php-xdebug-proxy/pull/7))
 - now `\Mougrim\XdebugProxy\Factory\Factory::createRequestPreparers()` accepts `$logger` param and also can throw `\Mougrim\XdebugProxy\RequestPreparer\Error` and `\Mougrim\XdebugProxy\RequestPreparer\Exception` if there is some problem ([#7](https://github.com/mougrim/php-xdebug-proxy/pull/7))
 
-[unreleased]: https://github.com/mougrim/php-xdebug-proxy/compare/0.5.0...HEAD
+[unreleased]: https://github.com/mougrim/php-xdebug-proxy/compare/0.5.1...HEAD
+[v0.5.1]: https://github.com/mougrim/php-xdebug-proxy/compare/0.5.0...0.5.1
 [v0.5.0]: https://github.com/mougrim/php-xdebug-proxy/compare/0.4.1...0.5.0
 [v0.4.1]: https://github.com/mougrim/php-xdebug-proxy/compare/0.4.0...0.4.1
 [v0.4.0]: https://github.com/mougrim/php-xdebug-proxy/compare/0.3.0...0.4.0
