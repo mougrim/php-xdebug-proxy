@@ -3,8 +3,12 @@
 ### [Unreleased]
 
 There are next changes:
-- Update minimum php version from 7.4 to 8.1
-- Remove psalm, now phpstan is used
+
+### [v0.6.0]
+
+There are next changes:
+- Update minimum php version from 7.4 to 8.1 ([#44](https://github.com/mougrim/php-xdebug-proxy/pull/44))
+- Remove psalm, now phpstan is used ([#44](https://github.com/mougrim/php-xdebug-proxy/pull/44))
 
 ### [v0.5.1]
 
@@ -83,7 +87,8 @@ There are next changes:
 - `\Mougrim\XdebugProxy\RequestPreparer\RequestPreparer` methods can throw `\Mougrim\XdebugProxy\RequestPreparer\Error` and `\Mougrim\XdebugProxy\RequestPreparer\Exception` if there is some problem ([#7](https://github.com/mougrim/php-xdebug-proxy/pull/7))
 - now `\Mougrim\XdebugProxy\Factory\Factory::createRequestPreparers()` accepts `$logger` param and also can throw `\Mougrim\XdebugProxy\RequestPreparer\Error` and `\Mougrim\XdebugProxy\RequestPreparer\Exception` if there is some problem ([#7](https://github.com/mougrim/php-xdebug-proxy/pull/7))
 
-[unreleased]: https://github.com/mougrim/php-xdebug-proxy/compare/0.5.1...HEAD
+[unreleased]: https://github.com/mougrim/php-xdebug-proxy/compare/0.6.0...HEAD
+[v0.6.0]: https://github.com/mougrim/php-xdebug-proxy/compare/0.5.1...0.6.0
 [v0.5.1]: https://github.com/mougrim/php-xdebug-proxy/compare/0.5.0...0.5.1
 [v0.5.0]: https://github.com/mougrim/php-xdebug-proxy/compare/0.4.1...0.5.0
 [v0.4.1]: https://github.com/mougrim/php-xdebug-proxy/compare/0.4.0...0.4.1
