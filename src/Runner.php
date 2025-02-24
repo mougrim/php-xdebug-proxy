@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Mougrim\XdebugProxy;
 
+use JetBrains\PhpStorm\NoReturn;
 use Mougrim\XdebugProxy\Config\Config;
 use Mougrim\XdebugProxy\Factory\Factory;
 use Mougrim\XdebugProxy\RequestPreparer\Error as RequestPreparerError;
 use Mougrim\XdebugProxy\RequestPreparer\Exception as RequestPreparerException;
 use Psr\Log\LoggerInterface;
+use Revolt\EventLoop\UnsupportedFeatureException;
+
 use const PHP_EOL;
 use const STDERR;
 use const STDOUT;
+
 use function fwrite;
 use function getopt;
 use function is_array;
@@ -22,6 +26,8 @@ use function realpath;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
+ *
+ * @phpstan-import-type XdebugProxyConfigArray from Config
  */
 class Runner
 {
@@ -32,8 +38,6 @@ class Runner
 
             if (isset($options['help'])) {
                 $this->showHelp();
-
-                return;
             }
 
             $configsPath = $this->getConfigsPath($options);
@@ -51,8 +55,6 @@ class Runner
             } catch (RequestPreparerError $exception) {
                 $logger->critical("Can't create request preparers: {$exception}");
                 $this->end(1);
-
-                return;
             }
             $ideHandler = $factory->createIdeHandler(
                 $logger,
@@ -63,16 +65,17 @@ class Runner
             $xdebugHandler = $factory->createXdebugHandler($logger, $xmlConverter, $ideHandler);
             $factory->createProxy($logger, $config, $xmlConverter, $ideHandler, $xdebugHandler)
                 ->run();
-        } catch (RunError $error) {
+        } catch (RunError|UnsupportedFeatureException $error) {
             $this->errorFallback('');
             $this->errorFallback('There is error:');
-            $this->errorFallback($error->getMessage());
+            $this->errorFallback($error->__toString());
             $this->errorFallback('');
             $this->showHelp($error->getCode() ?: 1);
         }
     }
 
-    protected function showHelp(int $exitCode = null): void
+    #[NoReturn]
+    protected function showHelp(?int $exitCode = null): void
     {
         if ($exitCode === null) {
             $exitCode = 0;
@@ -94,13 +97,7 @@ class Runner
     }
 
     /**
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
-     * @psalm-suppress InvalidReturnType
-     * @psalm-suppress InvalidReturnStatement
-     * @psalm-suppress MixedAssignment
-     *
-     * @return array{configs: string|null, help: bool|null}
+     * @return array{configs?: string, help?: false}
      */
     protected function getOptions(): array
     {
@@ -108,7 +105,7 @@ class Runner
             'c' => 'configs',
             'h' => 'help',
         ];
-        /** @var array $rawOptions */
+        /** @var array<array-key, string|false> $rawOptions */
         $rawOptions = getopt('c:h', ['configs:', 'help']);
         $result = [];
         foreach ($shortToLongOptions as $shortOption => $longOption) {
@@ -119,15 +116,16 @@ class Runner
             }
         }
 
+        /** @phpstan-ignore return.type */
         return $result;
     }
 
     /**
-     * @param array{configs: string|null} $options
+     * @param array{configs?: string} $options
      */
     protected function getConfigsPath(array $options): string
     {
-        $configPath = $options['configs'] ?? __DIR__.'/../config';
+        $configPath = $options['configs'] ?? __DIR__ . '/../config';
         $realConfigPath = realpath($configPath);
         if (!$realConfigPath || !is_dir($realConfigPath)) {
             throw new RunError("Wrong config path {$configPath}", 1);
@@ -139,20 +137,19 @@ class Runner
 
     protected function getConfig(string $configsPath, Factory $factory): Config
     {
-        $configPath = $configsPath.'/config.php';
+        $configPath = $configsPath . '/config.php';
         $config = $this->requireConfig($configPath);
         if (!is_array($config)) {
             throw new RunError("Config '{$configPath}' should return array.");
         }
+        /** @var XdebugProxyConfigArray $config */
 
-        /** @psalm-suppress MixedArgumentTypeCoercion */
         return $factory->createConfig($config);
     }
 
     protected function getFactory(string $configsPath): Factory
     {
-        $factoryConfigPath = $configsPath.'/factory.php';
-        /** @var Factory $factory */
+        $factoryConfigPath = $configsPath . '/factory.php';
         $factory = $this->requireConfig($factoryConfigPath);
         if (!$factory instanceof Factory) {
             throw new RunError("Factory config '{$factoryConfigPath}' should return Factory object.");
@@ -163,8 +160,7 @@ class Runner
 
     protected function getLogger(string $configsPath): LoggerInterface
     {
-        $loggerConfigPath = $configsPath.'/logger.php';
-        /** @var LoggerInterface $logger */
+        $loggerConfigPath = $configsPath . '/logger.php';
         $logger = $this->requireConfig($loggerConfigPath);
         if (!$logger instanceof LoggerInterface) {
             throw new RunError("Logger config '{$loggerConfigPath}' should return LoggerInterface object.");
@@ -174,24 +170,25 @@ class Runner
     }
 
     /**
-     * @return mixed
+     * @throws RunError
      */
-    protected function requireConfig(string $path)
+    protected function requireConfig(string $path): mixed
     {
         if (!is_file($path) || !is_readable($path)) {
             throw new RunError("Wrong config path {$path}.");
         }
-        /** @noinspection PhpIncludeInspection */
         return require $path;
     }
 
-    /** @psalm-suppress MixedInferredReturnType */
     public function getScriptName(): string
     {
-        /** @psalm-suppress MixedReturnStatement */
-        return $_SERVER['argv'][0] ?? 'xdebug-proxy';
+        /** @var array<int, string> $argv */
+        $argv = $_SERVER['argv'];
+
+        return $argv[0] ?? 'xdebug-proxy';
     }
 
+    #[NoReturn]
     protected function end(int $exitCode): void
     {
         exit($exitCode);
@@ -199,11 +196,11 @@ class Runner
 
     protected function errorFallback(string $message): void
     {
-        fwrite(STDERR, $message.PHP_EOL);
+        fwrite(STDERR, $message . PHP_EOL);
     }
 
     protected function infoFallback(string $message): void
     {
-        fwrite(STDOUT, $message.PHP_EOL);
+        fwrite(STDOUT, $message . PHP_EOL);
     }
 }

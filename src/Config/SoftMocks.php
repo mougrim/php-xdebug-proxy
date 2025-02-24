@@ -6,22 +6,20 @@ namespace Mougrim\XdebugProxy\Config;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
+ *
+ * @phpstan-type SoftMocksConfigArray array{initScript?: string}
+ * @phpstan-type SoftMocksDefaultConfigArray array{initScript: string}
  */
 class SoftMocks
 {
-    /** @var array{initScript: string|null} */
-    protected array $config;
-    /** @var array{initScript: string} */
-    protected array $defaultConfig;
-
     /**
-     * @param array{initScript: string|null} $config
-     * @param array{initScript: string} $defaultConfig
+     * @param SoftMocksConfigArray $config
+     * @param SoftMocksDefaultConfigArray $defaultConfig
      */
-    public function __construct(array $config, array $defaultConfig)
-    {
-        $this->config = $config;
-        $this->defaultConfig = $defaultConfig;
+    public function __construct(
+        protected readonly array $config,
+        protected readonly array $defaultConfig,
+    ) {
     }
 
     public function getInitScript(): string

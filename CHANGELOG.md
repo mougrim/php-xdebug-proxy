@@ -3,6 +3,8 @@
 ### [Unreleased]
 
 There are next changes:
+- Update minimum php version from 7.4 to 8.1
+- Remove psalm, now phpstan is used
 
 ### [v0.5.1]
 

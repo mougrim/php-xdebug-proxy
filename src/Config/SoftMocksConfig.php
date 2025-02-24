@@ -6,25 +6,31 @@ namespace Mougrim\XdebugProxy\Config;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
+ *
+ * @phpstan-import-type ServerConfigArray from Server
+ * @phpstan-import-type IdeServerConfigArray from IdeServer
+ * @phpstan-import-type SoftMocksConfigArray from SoftMocks
+ * @phpstan-import-type SoftMocksDefaultConfigArray from SoftMocks
+ *
+ * @phpstan-type XdebugProxySoftMocksConfigArray array{xdebugServer?: ServerConfigArray, ideRegistrationServer?: ServerConfigArray, ideServer?: IdeServerConfigArray, softMocks?: SoftMocksConfigArray}
  */
 class SoftMocksConfig extends Config
 {
+    /** @var SoftMocksDefaultConfigArray */
     public const DEFAULT_SOFT_MOCKS_CONFIG = [
         'initScript' => '',
     ];
 
-    protected SoftMocks $softMocks;
+    protected readonly SoftMocks $softMocks;
 
     /**
-     * @param array<array-key, array> $config
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedArgumentTypeCoercion
+     * @param XdebugProxySoftMocksConfigArray $config
      */
     public function __construct(array $config)
     {
         parent::__construct($config);
         $this->softMocks = new SoftMocks(
-            $this->config['softMocks'] ?? [],
+            $config['softMocks'] ?? [],
             static::DEFAULT_SOFT_MOCKS_CONFIG
         );
     }

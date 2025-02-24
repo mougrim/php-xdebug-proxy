@@ -6,7 +6,7 @@ declare(strict_types=1);
  * @author Mougrim <rinat@mougrim.ru>
  */
 
-namespace Mougrim\XdebugProxy;
+namespace Mougrim\XdebugProxy\config;
 
 return [
     'xdebugServer' => [

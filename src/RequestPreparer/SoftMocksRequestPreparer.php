@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Mougrim\XdebugProxy\RequestPreparer;
 
 // Badoo\SoftMocks is optional for xdebug-proxy
-use /** @noinspection PhpUndefinedClassInspection */
-    /** @noinspection PhpUndefinedNamespaceInspection */
-    Badoo\SoftMocks;
+use /** @noinspection PhpUndefinedClassInspection */ /** @noinspection PhpUndefinedNamespaceInspection */ Badoo\SoftMocks;
 use Mougrim\XdebugProxy\Handler\CommandToXdebugParser;
 use Mougrim\XdebugProxy\Xml\XmlDocument;
 use Psr\Log\LoggerInterface;
 use Throwable;
+
 use function file_exists;
 use function in_array;
 use function is_file;
@@ -21,27 +20,20 @@ use function realpath;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
- * @psalm-suppress UndefinedClass
  */
 class SoftMocksRequestPreparer implements RequestPreparer
 {
-    protected LoggerInterface $logger;
-
     /**
-     * @param string $initScript
-     *
      * @throws Error
      */
-    public function __construct(LoggerInterface $logger, string $initScript = null)
-    {
-        if ($initScript === null) {
-            $initScript = '';
-        }
-        $this->logger = $logger;
+    public function __construct(
+        protected readonly LoggerInterface $logger,
+        string $initScript = '',
+    ) {
         if (!$initScript) {
             $possibleInitScriptPaths = [
-                __DIR__.'/../../vendor/badoo/soft-mocks/src/init_with_composer.php',
-                __DIR__.'/../../../../badoo/soft-mocks/src/init_with_composer.php',
+                __DIR__ . '/../../vendor/badoo/soft-mocks/src/init_with_composer.php',
+                __DIR__ . '/../../../../badoo/soft-mocks/src/init_with_composer.php',
             ];
             foreach ($possibleInitScriptPaths as $possiblInitScriptPath) {
                 if (file_exists($possiblInitScriptPath)) {
@@ -55,10 +47,6 @@ class SoftMocksRequestPreparer implements RequestPreparer
         if (!$initScript) {
             throw new Error("Can't find soft-mocks init script");
         }
-        /**
-         * @psalm-suppress UnresolvableInclude
-         * @noinspection PhpIncludeInspection
-         */
         require $initScript;
     }
 
@@ -86,18 +74,21 @@ class SoftMocksRequestPreparer implements RequestPreparer
         }
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     protected function getOriginalFilePath(string $file, array $context): string
     {
         // workaround some symbols like '+' are encoded like %2B
         $file = rawurldecode($file);
-        /** @var array|false $parts */
         $parts = parse_url($file);
         if ($parts === false) {
             $this->logger->warning("Can't parse file '{$file}'", $context);
 
             return $file;
         }
-        if ($parts['scheme'] !== 'file') {
+        /** @noinspection OffsetOperationsInspection */
+        if (($parts['scheme'] ?? '') !== 'file') {
             $this->logger->warning("Scheme isn't file '{$file}'", $context);
 
             return $file;
@@ -105,7 +96,9 @@ class SoftMocksRequestPreparer implements RequestPreparer
 
         try {
             /** @noinspection PhpUndefinedClassInspection */
-            return 'file://'.SoftMocks::getOriginalFilePath($parts['path']);
+            /** @noinspection OffsetOperationsInspection */
+            /** @phpstan-ignore binaryOp.invalid, class.notFound */
+            return 'file://' . SoftMocks::getOriginalFilePath($parts['path'] ?? '');
         } catch (Throwable $throwable) {
             $this->logger->warning("Can't get original file path: {$throwable}", $context);
 
@@ -136,6 +129,9 @@ class SoftMocksRequestPreparer implements RequestPreparer
         return $request;
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     protected function getRewrittenFilePath(string $file, array $context): string
     {
         $originalFile = $file;
@@ -145,6 +141,7 @@ class SoftMocksRequestPreparer implements RequestPreparer
 
             return '';
         }
+        /** @noinspection OffsetOperationsInspection */
         if (($parts['scheme'] ?? '') !== 'file') {
             $this->logger->warning("Scheme isn't file '{$file}'", $context);
 
@@ -152,7 +149,9 @@ class SoftMocksRequestPreparer implements RequestPreparer
         }
         try {
             /** @noinspection PhpUndefinedClassInspection */
-            $rewrittenFile = (string) SoftMocks::getRewrittenFilePath($parts['path']);
+            /** @noinspection OffsetOperationsInspection */
+            /** @phpstan-ignore class.notFound, cast.string */
+            $rewrittenFile = (string) SoftMocks::getRewrittenFilePath($parts['path'] ?? '');
         } catch (Throwable $throwable) {
             $this->logger->warning("Can't get rewritten file path: {$throwable}", $context);
 
@@ -174,6 +173,6 @@ class SoftMocksRequestPreparer implements RequestPreparer
             return '';
         }
 
-        return 'file://'.$file;
+        return 'file://' . $file;
     }
 }

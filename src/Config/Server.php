@@ -6,22 +6,20 @@ namespace Mougrim\XdebugProxy\Config;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
+ *
+ * @phpstan-type ServerConfigArray array{listen?: string}
+ * @phpstan-type ServerDefaultConfigArray array{listen: string}
  */
 class Server
 {
-    /** @var array{listen: string|null} */
-    protected array $config;
-    /** @var array{listen: string} */
-    protected array $defaultConfig;
-
     /**
-     * @param array{listen: string|null} $config
-     * @param array{listen: string} $defaultConfig
+     * @param ServerConfigArray $config
+     * @param ServerDefaultConfigArray $defaultConfig
      */
-    public function __construct(array $config, array $defaultConfig)
-    {
-        $this->config = $config;
-        $this->defaultConfig = $defaultConfig;
+    public function __construct(
+        protected readonly array $config,
+        protected readonly array $defaultConfig,
+    ) {
     }
 
     public function getListen(): string

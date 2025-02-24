@@ -18,11 +18,14 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
+ *
+ * @phpstan-import-type XdebugProxyConfigArray from Config
  */
 class DefaultFactory implements Factory
 {
     /**
-     * @param array<array-key, array> $config
+     * @param array<string, array<string, mixed>> $config
+     * @phpstan-param XdebugProxyConfigArray $config
      */
     public function createConfig(array $config): Config
     {
@@ -41,14 +44,11 @@ class DefaultFactory implements Factory
         LoggerInterface $logger,
         IdeServerConfig $config,
         XmlConverter $xmlConverter,
-        array $requestPreparers
+        array $requestPreparers,
     ): IdeHandler {
         return new DefaultIdeHandler($logger, $config, $xmlConverter, $requestPreparers);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createRequestPreparers(LoggerInterface $logger, Config $config): array
     {
         return [];
@@ -57,7 +57,7 @@ class DefaultFactory implements Factory
     public function createXdebugHandler(
         LoggerInterface $logger,
         XmlConverter $xmlConverter,
-        IdeHandler $ideHandler
+        IdeHandler $ideHandler,
     ): XdebugHandler {
         return new DefaultXdebugHandler($logger, $xmlConverter, $ideHandler);
     }
@@ -67,7 +67,7 @@ class DefaultFactory implements Factory
         Config $config,
         XmlConverter $xmlConverter,
         IdeHandler $ideHandler,
-        XdebugHandler $xdebugHandler
+        XdebugHandler $xdebugHandler,
     ): Proxy {
         return new Proxy($logger, $config, $xmlConverter, $ideHandler, $xdebugHandler);
     }

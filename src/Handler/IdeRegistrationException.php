@@ -5,23 +5,24 @@ declare(strict_types=1);
 namespace Mougrim\XdebugProxy\Handler;
 
 use Exception;
+use Mougrim\XdebugProxy\Enum\RegistrationError;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
  */
 class IdeRegistrationException extends Exception
 {
-    protected string $command;
-
-    public function __construct(int $error_id, string $message, string $command = 'proxyerror')
-    {
-        parent::__construct($message, $error_id);
-        $this->command = $command;
+    public function __construct(
+        protected RegistrationError $error,
+        string $message,
+        protected string $command = 'proxyerror',
+    ) {
+        parent::__construct($message, $error->value);
     }
 
-    public function getErrorId(): int
+    public function getError(): RegistrationError
     {
-        return $this->code;
+        return $this->error;
     }
 
     public function getCommand(): string

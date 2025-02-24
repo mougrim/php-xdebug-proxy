@@ -12,14 +12,20 @@ use Throwable;
  */
 class Exception extends BaseException
 {
-    protected array $context;
-
-    public function __construct(string $message, array $context = [], Throwable $previous = null)
-    {
+    /**
+     * @param array<string, mixed> $context
+     */
+    public function __construct(
+        string $message,
+        protected array $context = [],
+        ?Throwable $previous = null,
+    ) {
         parent::__construct($message, 0, $previous);
-        $this->context = $context;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getContext(): array
     {
         return $this->context;

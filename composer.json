@@ -3,20 +3,18 @@
     "description": "Xdebug (dbgp) proxy",
     "type": "project",
     "require": {
-        "php": ">=7.4",
-        "amphp/socket": "^0.10.8"
+        "php": ">=8.1",
+        "amphp/socket": "^2.3"
     },
     "require-dev": {
         "ext-dom": "*",
         "roave/security-advisories": "dev-latest",
-        "phpro/grumphp": "^1.5",
-        "friendsofphp/php-cs-fixer": "^3.5",
-        "phpunit/phpunit": "^9.0",
-        "amphp/log": "^1.0.0",
-        "vimeo/psalm": "^4.20"
-    },
-    "conflict": {
-        "amphp/parallel-functions": "=1.1.0"
+        "phpro/grumphp": "^2.9",
+        "friendsofphp/php-cs-fixer": "^3.64.0",
+        "phpunit/phpunit": "^10.5",
+        "amphp/log": "^2.0",
+        "phpstan/phpstan": "^2.0",
+        "jetbrains/phpstorm-attributes": "^1.2"
     },
     "license": "MIT",
     "authors": [
@@ -38,6 +36,7 @@
     },
     "suggest": {
         "ext-dom": "Required for parse XML by default",
+        "ext-pcntl": "Required for graceful stop daemon",
         "amphp/log": "Required for write logs by default"
     },
     "config": {

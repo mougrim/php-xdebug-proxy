@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Mougrim\XdebugProxy\Handler;
 
 use Amp\ByteStream\ClosedException;
-use Amp\Socket\ClientSocket;
+use Amp\ByteStream\StreamException;
+use Amp\CancelledException;
 use Amp\Socket\ConnectException;
-use Amp\Socket\ServerSocket;
-use Generator;
+use Amp\Socket\ResourceSocket;
+use Amp\Socket\Socket;
 use Mougrim\XdebugProxy\Config\IdeServer as IdeServerConfig;
+use Mougrim\XdebugProxy\Enum\RegistrationError;
 use Mougrim\XdebugProxy\RequestPreparer\Error as RequestPreparerError;
 use Mougrim\XdebugProxy\RequestPreparer\Exception as RequestPreparerException;
 use Mougrim\XdebugProxy\RequestPreparer\RequestPreparer;
@@ -19,7 +21,8 @@ use Mougrim\XdebugProxy\Xml\XmlDocument;
 use Mougrim\XdebugProxy\Xml\XmlException;
 use Psr\Log\LoggerInterface;
 use SplObjectStorage;
-use function Amp\asyncCoroutine;
+
+use function Amp\async;
 use function Amp\Socket\connect;
 use function array_diff;
 use function array_keys;
@@ -31,40 +34,30 @@ use function get_class;
 use function implode;
 use function preg_match;
 use function strlen;
-use function strpos;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
  */
 class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
 {
-    protected LoggerInterface $logger;
-    protected IdeServerConfig $config;
-    protected XmlConverter $xmlConverter;
-    /** @var RequestPreparer[] */
-    protected array $requestPreparers;
-    protected string $defaultIde;
+    protected readonly string $defaultIde;
     /** @var array<string, string> */
-    protected array $ideList = [];
+    protected array $ideList;
     /**
-     * @var SplObjectStorage<ServerSocket, ClientSocket>
+     * @var SplObjectStorage<ResourceSocket, Socket>
      */
-    protected SplObjectStorage $ideSockets;
+    protected readonly SplObjectStorage $ideSockets;
     protected int $maxIdeSockets = 100;
 
     /**
      * @param RequestPreparer[] $requestPreparers
      */
     public function __construct(
-        LoggerInterface $logger,
-        IdeServerConfig $config,
-        XmlConverter $xmlConverter,
-        array $requestPreparers
+        protected readonly LoggerInterface $logger,
+        protected readonly IdeServerConfig $config,
+        protected readonly XmlConverter $xmlConverter,
+        protected readonly array $requestPreparers,
     ) {
-        $this->logger = $logger;
-        $this->config = $config;
-        $this->xmlConverter = $xmlConverter;
-        $this->requestPreparers = $requestPreparers;
         $this->ideSockets = new SplObjectStorage();
         $this->defaultIde = $config->getDefaultIde();
         if ($this->defaultIde) {
@@ -81,10 +74,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         return $this->maxIdeSockets;
     }
 
-    /**
-     * @return $this
-     */
-    public function setMaxIdeSockets(int $maxIdeSockets): DefaultIdeHandler
+    public function setMaxIdeSockets(int $maxIdeSockets): static
     {
         $this->maxIdeSockets = $maxIdeSockets;
 
@@ -96,23 +86,23 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         return $this->ideList;
     }
 
-    public function handle(ServerSocket $socket): Generator
+    public function handle(ResourceSocket $socket): void
     {
-        [$ip, $port] = explode(':', (string) $socket->getRemoteAddress());
+        [$ip, $port] = explode(':', $socket->getRemoteAddress()->toString());
         $baseContext = [
             'ide' => "{$ip}:{$port}",
         ];
         $this->logger->notice('[IdeRegistration] Accepted connection.', $baseContext);
 
         $request = '';
-        while (($data = yield $socket->read()) !== null) {
+        while (($data = $socket->read()) !== null) {
             $request .= $data;
-            if (strpos($request, "\0") !== false) {
+            if (str_contains($request, "\0")) {
                 break;
             }
         }
         $requests = explode("\0", $request);
-        if ($request[strlen($request) - 1] !== "\0") {
+        if ($request && $request[strlen($request) - 1] !== "\0") {
             $this->logger->warning(
                 "[IdeRegistration] Part of request isn't full, skip it",
                 $baseContext + ['request' => $request]
@@ -126,7 +116,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
             }
             $context = $baseContext;
             $context['request'] = $request;
-            if (strpos($request, ' ') === false) {
+            if (!str_contains($request, ' ')) {
                 $this->logger->error('[IdeRegistration] Invalid request from IDE.', $context);
                 continue;
             }
@@ -156,10 +146,10 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                             '[IdeRegistration] Missing required arguments.',
                             $context + ['missingRequiredArguments' => $missingRequiredArguments]
                         );
-                        /** @psalm-suppress MixedArgument */
                         throw new IdeRegistrationException(
-                            static::REGISTRATION_ERROR_MISSING_REQUIRED_ARGUMENTS,
-                            'Next required arguments are missing: '.implode(', ', $missingRequiredArguments),
+                            RegistrationError::MissingRequiredArguments,
+                            'Next required arguments are missing: '
+                                . implode(', ', $missingRequiredArguments),
                             $command
                         );
                     }
@@ -173,9 +163,8 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                                 '[IdeRegistration] Port should be a number.',
                                 $context + ['port' => $arguments['-p']]
                             );
-                            /** @psalm-suppress MixedArgument */
                             throw new IdeRegistrationException(
-                                static::REGISTRATION_ERROR_ARGUMENT_FORMAT,
+                                RegistrationError::ArgumentFormat,
                                 'Port should be a number',
                                 $command
                             );
@@ -219,9 +208,8 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                         break;
                     default:
                         $this->logger->error('[IdeRegistration] Unknown command from IDE.', $context);
-                        /** @psalm-suppress MixedArgument */
                         throw new IdeRegistrationException(
-                            static::REGISTRATION_ERROR_UNKNOWN_COMMAND,
+                            RegistrationError::UnknownCommand,
                             "Unknown command '{$command}'"
                         );
                 }
@@ -229,22 +217,20 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                 $xmlContainerMessage = (new XmlContainer('message'))
                     ->setContent($exception->getMessage());
                 $xmlContainerError = (new XmlContainer('error'))
-                    ->addAttribute('id', (string) $exception->getErrorId())
+                    ->addAttribute('id', (string) $exception->getError()->value)
                     ->addChild($xmlContainerMessage);
                 $xmlContainer = (new XmlContainer($exception->getCommand()))
                     ->addAttribute('success', '0')
                     ->addChild($xmlContainerError);
             }
-            /** @psalm-suppress PossiblyUndefinedVariable */
-            $xmlDocument = (new XmlDocument('1.0', 'UTF-8'))
-                ->setRoot($xmlContainer);
+            $xmlDocument = new XmlDocument('1.0', 'UTF-8', $xmlContainer);
             try {
                 $responses[] = $this->xmlConverter->generate($xmlDocument);
             } catch (XmlException $exception) {
                 $this->logger->notice("[IdeRegistration] Can't generate response: {$exception}", $context);
                 try {
-                    yield $socket->end();
-                } /** @noinspection BadExceptionsProcessingInspection */ catch (ClosedException $ignoreException) {
+                    $socket->end();
+                } /** @noinspection BadExceptionsProcessingInspection */ catch (ClosedException|StreamException) {
                     // we can't do anything else after try to close connection
                 }
 
@@ -260,8 +246,9 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
             $baseContext + ['response' => $response]
         );
         try {
-            yield $socket->end($response);
-        } catch (ClosedException $exception) {
+            $socket->write($response);
+            $socket->end();
+        } catch (ClosedException|StreamException $exception) {
             $this->logger->error(
                 "[IdeRegistration] Can't write response to ide: {$exception}",
                 $baseContext + ['response' => $response]
@@ -273,19 +260,17 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
      * @throws FromXdebugProcessError
      * @throws FromXdebugProcessException
      */
-    public function processRequest(XmlDocument $xmlRequest, string $rawRequest, ServerSocket $xdebugSocket): Generator
+    public function processRequest(XmlDocument $xmlRequest, string $rawRequest, ResourceSocket $xdebugSocket): void
     {
         $context = [
-            'xdebug' => $xdebugSocket->getRemoteAddress(),
+            'xdebug' => $xdebugSocket->getRemoteAddress()->toString(),
             'request' => $rawRequest,
         ];
         if (!$this->ideSockets->contains($xdebugSocket)) {
-            yield from $this->processInit($xmlRequest, $rawRequest, $xdebugSocket);
+            $this->processInit($xmlRequest, $rawRequest, $xdebugSocket);
         }
-        /** @var ClientSocket $ideSocket */
         $ideSocket = $this->ideSockets->offsetGet($xdebugSocket);
-        /** @psalm-suppress MixedAssignment */
-        $context['ide'] = $ideSocket->getRemoteAddress();
+        $context['ide'] = $ideSocket->getRemoteAddress()->toString();
         try {
             $this->prepareRequestToIde($xmlRequest, $rawRequest, $context);
         } catch (RequestPreparerError $error) {
@@ -298,8 +283,8 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
             throw new FromXdebugProcessError("Can't generate response", $context, $exception);
         }
         try {
-            yield $ideSocket->write(strlen($request)."\0{$request}\0");
-        } catch (ClosedException $exception) {
+            $ideSocket->write(strlen($request) . "\0{$request}\0");
+        } catch (ClosedException|StreamException $exception) {
             throw new FromXdebugProcessError(
                 "Can't send request to ide",
                 $context + ['generatedRequest' => $request],
@@ -311,6 +296,8 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
     }
 
     /**
+     * @param array<string, mixed> $context
+     *
      * @throws RequestPreparerError
      */
     protected function prepareRequestToIde(XmlDocument $xmlRequest, string $rawRequest, array $context): void
@@ -329,18 +316,22 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         }
     }
 
-    public function close(ServerSocket $xdebugSocket): Generator
+    public function close(ResourceSocket $xdebugSocket): void
     {
         if (!$this->ideSockets->contains($xdebugSocket)) {
             return;
         }
-        /** @var ClientSocket $ideSocket */
         $ideSocket = $this->ideSockets->offsetGet($xdebugSocket);
 
         try {
-            yield $ideSocket->end();
-        } /** @noinspection BadExceptionsProcessingInspection */ catch (ClosedException $ignore) {
+            $ideSocket->end();
+        } /** @noinspection BadExceptionsProcessingInspection */ catch (ClosedException) {
             // already closed
+        } catch (StreamException $exception) {
+            $this->logger->error(
+                "Can't close ide socket: {$exception}",
+                ['exception' => $exception],
+            );
         }
         $this->ideSockets->detach($xdebugSocket);
     }
@@ -349,10 +340,10 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
      * @throws FromXdebugProcessError
      * @throws FromXdebugProcessException
      */
-    protected function processInit(XmlDocument $xmlRequest, string $rawRequest, ServerSocket $xdebugSocket): Generator
+    protected function processInit(XmlDocument $xmlRequest, string $rawRequest, ResourceSocket $xdebugSocket): void
     {
         $context = [
-            'xdebug' => $xdebugSocket->getRemoteAddress(),
+            'xdebug' => $xdebugSocket->getRemoteAddress()->toString(),
             'request' => $rawRequest,
         ];
         $xmlContainer = $xmlRequest->getRoot();
@@ -382,31 +373,29 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         $this->logger->notice('[Xdebug][Ide][Init] Try to init connect to ide.', $context);
 
         try {
-            /** @var ClientSocket $ideSocket */
-            $ideSocket = yield connect("tcp://{$ide}");
-        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (ConnectException $exception) {
+            $ideSocket = connect("tcp://{$ide}");
+        } catch (ConnectException|CancelledException $exception) {
             throw new FromXdebugProcessError("Can't connect to ide", $context, $exception);
         }
         $this->ideSockets->attach($xdebugSocket, $ideSocket);
 
         $this->logger->notice('[Xdebug][Ide][Init] Successful connected to ide.', $context);
 
-        $handleIde = asyncCoroutine([$this, 'handleIde']);
-        $handleIde($ideKey, $xdebugSocket, $ideSocket);
+        async(fn () => $this->handleIde($ideKey, $xdebugSocket, $ideSocket));
     }
 
-    public function handleIde(string $ideKey, ServerSocket $xdebugSocket, ClientSocket $ideSocket): Generator
+    protected function handleIde(string $ideKey, ResourceSocket $xdebugSocket, Socket $ideSocket): void
     {
         $context = [
-            'ide' => $ideSocket->getRemoteAddress(),
+            'ide' => $ideSocket->getRemoteAddress()->toString(),
             'key' => $ideKey,
-            'xdebug' => $xdebugSocket->getRemoteAddress(),
+            'xdebug' => $xdebugSocket->getRemoteAddress()->toString(),
         ];
         $buffer = '';
         try {
-            while (($chunk = yield $ideSocket->read()) !== null) {
+            while (($chunk = $ideSocket->read()) !== null) {
                 $buffer .= $chunk;
-                while (strpos($buffer, "\0") !== false) {
+                while (str_contains($buffer, "\0")) {
                     [$request, $buffer] = explode("\0", $buffer, 2);
                     $this->logger->info(
                         '[Xdebug][Ide] Process ide request',
@@ -417,15 +406,17 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
                         '[Xdebug][Ide] Send prepared request to xdebug',
                         $context + ['request' => $request]
                     );
-                    $xdebugSocket->write($request."\0");
+                    $xdebugSocket->write($request . "\0");
                 }
             }
         } /** @noinspection BadExceptionsProcessingInspection */ catch (ClosedException $exception) {
             // skip exception, close other connections below
-        } catch (RequestPreparerError $error) {
+        } catch (StreamException|RequestPreparerError $error) {
             $this->logger->critical(
-                "Can't prepare request: {$error}",
-                $context
+                "Can't prepare request",
+                $context + [
+                    'exception' => $error,
+                ],
             );
             // close other connections below
         }
@@ -440,16 +431,22 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         $this->logger->notice('[Xdebug][Ide] End handle from ide, close connections.', $context);
         $this->close($xdebugSocket);
         try {
-            yield $xdebugSocket->end();
-        } /** @noinspection BadExceptionsProcessingInspection */ catch (ClosedException $ignore) {
+            $xdebugSocket->end();
+        } /** @noinspection BadExceptionsProcessingInspection */ catch (ClosedException) {
             // already closed
+        } catch (StreamException $exception) {
+            $this->logger->error(
+                "Can't close xdebug socket",
+                $context + ['exception' => $exception]
+            );
         }
     }
 
     /**
-     * @throws RequestPreparerError
-     *
+     * @param array<string, mixed> $context
      * @return string prepared request
+     *
+     * @throws RequestPreparerError
      */
     protected function prepareRequestToXdebug(string $request, array $context): string
     {
@@ -470,6 +467,9 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
         return $request;
     }
 
+    /**
+     * @return array{string, array<string, string>}
+     */
     public function parseCommand(string $request): array
     {
         [$command, $arguments] = explode(' ', $request, 2);
@@ -488,7 +488,7 @@ class DefaultIdeHandler implements IdeHandler, CommandToXdebugParser
             $argumentStrings[] = "{$argument} {$value}";
         }
 
-        return $command.' '.implode(' ', $argumentStrings);
+        return $command . ' ' . implode(' ', $argumentStrings);
     }
 
     /**

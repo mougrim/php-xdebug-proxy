@@ -1,0 +1,40 @@
+name: PHPStan Static analysis
+
+on: [push, pull_request]
+
+jobs:
+  psalm:
+    name: PHPStan
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: "none"
+          ini-values: memory_limit=-1,apc.enable_cli=1,zend.assertions=1
+          php-version: "8.1"
+          tools: flex
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: "Restore result cache"
+        uses: actions/cache/restore@v4
+        with:
+          path: tmp # same as in phpstan.neon
+          key: "phpstan-result-cache-${{ github.run_id }}"
+          restore-keys: |
+            phpstan-result-cache-
+
+      - name: "Run PHPStan"
+        run: "vendor/bin/phpstan"
+
+      - name: "Save result cache"
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: tmp # same as in phpstan.neon
+          key: "phpstan-result-cache-${{ github.run_id }}"

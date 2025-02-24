@@ -8,10 +8,13 @@ grumphp:
         phpcsfixer2:
             allow_risky: true
             config: .php-cs-fixer.php
-        psalm:
-            config: psalm.xml
-            no_cache: true
-            show_info: true
-            ignore_patterns:
-                - tests/
+        phpstan:
+            autoload_file: ~
+            configuration: phpstan.neon
+            level: null
+            force_patterns: []
+            ignore_patterns: []
+            triggered_by: ['php']
+            memory_limit: "-1"
+            use_grumphp_paths: true
     extensions: []

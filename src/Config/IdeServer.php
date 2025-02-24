@@ -6,22 +6,20 @@ namespace Mougrim\XdebugProxy\Config;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
+ *
+ * @phpstan-type IdeServerConfigArray array{defaultIde?: string, predefinedIdeList?: array<string, string>}
+ * @phpstan-type IdeServerDefaultConfigArray array{defaultIde: string, predefinedIdeList: array<string, string>}
  */
 class IdeServer
 {
-    /** @var array{defaultIde: string|null, predefinedIdeList: array<string, string>|null} */
-    protected array $config;
-    /** @var array{defaultIde: string, predefinedIdeList: array<string, string>} */
-    protected array $defaultConfig;
-
     /**
-     * @param array{defaultIde: string|null, predefinedIdeList: array<string, string>|null} $config
-     * @param array{defaultIde: string, predefinedIdeList: array<string, string>} $defaultConfig
+     * @param IdeServerConfigArray $config
+     * @param IdeServerDefaultConfigArray $defaultConfig
      */
-    public function __construct(array $config, array $defaultConfig)
-    {
-        $this->config = $config;
-        $this->defaultConfig = $defaultConfig;
+    public function __construct(
+        protected readonly array $config,
+        protected readonly array $defaultConfig,
+    ) {
     }
 
     public function getDefaultIde(): string

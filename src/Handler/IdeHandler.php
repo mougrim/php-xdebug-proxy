@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mougrim\XdebugProxy\Handler;
 
-use Amp\Socket\ServerSocket;
-use Generator;
+use Amp\Socket\ResourceSocket;
+use Mougrim\XdebugProxy\Enum\RegistrationCommand;
 use Mougrim\XdebugProxy\Xml\XmlDocument;
 
 /**
@@ -13,31 +13,30 @@ use Mougrim\XdebugProxy\Xml\XmlDocument;
  */
 interface IdeHandler extends Handler
 {
-    public const REGISTRATION_COMMAND_INIT = 'proxyinit';
-    public const REGISTRATION_COMMAND_STOP = 'proxystop';
-
+    /** @var array<string, array{supportedArguments: array<string>, requiredArguments: array<string>}> */
     public const REGISTRATION_ARGUMENTS = [
-        self::REGISTRATION_COMMAND_INIT => [
+        /** @uses RegistrationCommand::Init */
+        'proxyinit' => [
             'supportedArguments' => ['-p', '-k'],
             'requiredArguments' => ['-p', '-k'],
         ],
-        self::REGISTRATION_COMMAND_STOP => [
+        /** @uses RegistrationCommand::Stop */
+        'proxystop' => [
             'supportedArguments' => ['-k'],
             'requiredArguments' => ['-k'],
         ],
     ];
 
-    public const REGISTRATION_ERROR_UNKNOWN_COMMAND = 1;
-    public const REGISTRATION_ERROR_ARGUMENT_FORMAT = 2;
-    public const REGISTRATION_ERROR_MISSING_REQUIRED_ARGUMENTS = 3;
-
+    /**
+     * @return array<string, string>
+     */
     public function getIdeList(): array;
 
     /**
      * @throws FromXdebugProcessError
      * @throws FromXdebugProcessException
      */
-    public function processRequest(XmlDocument $xmlRequest, string $rawRequest, ServerSocket $xdebugSocket): Generator;
+    public function processRequest(XmlDocument $xmlRequest, string $rawRequest, ResourceSocket $xdebugSocket): void;
 
-    public function close(ServerSocket $xdebugSocket): Generator;
+    public function close(ResourceSocket $xdebugSocket): void;
 }

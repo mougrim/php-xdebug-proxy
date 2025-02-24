@@ -11,19 +11,18 @@ use Mougrim\XdebugProxy\RequestPreparer\Exception as RequestPreparerException;
 use Mougrim\XdebugProxy\RequestPreparer\RequestPreparer;
 use Mougrim\XdebugProxy\RequestPreparer\SoftMocksRequestPreparer;
 use Psr\Log\LoggerInterface;
-use function array_merge;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
+ *
+ * @phpstan-import-type XdebugProxySoftMocksConfigArray from SoftMocksConfig
  */
 class SoftMocksFactory extends DefaultFactory
 {
     /**
      * @noinspection PhpMissingParentCallCommonInspection
-     * {@inheritdoc}
      *
-     * @param array<array-key, array> $config
-     *
+     * @param XdebugProxySoftMocksConfigArray $config
      * @return SoftMocksConfig
      */
     public function createConfig(array $config): Config
@@ -32,29 +31,27 @@ class SoftMocksFactory extends DefaultFactory
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @psalm-suppress MoreSpecificImplementedParamType
-     *
      * @param SoftMocksConfig $config
+     * @return RequestPreparer[]
      *
      * @throws RequestPreparerException
      * @throws RequestPreparerError
-     *
-     * @return RequestPreparer[]
      */
     public function createRequestPreparers(LoggerInterface $logger, Config $config): array
     {
         $requestPreparers = parent::createRequestPreparers($logger, $config);
+        $requestPreparers[] = $this->createSoftMocksRequestPreparer($logger, $config);
 
-        return array_merge($requestPreparers, [$this->createSoftMocksRequestPreparer($logger, $config)]);
+        return $requestPreparers;
     }
 
     /**
      * @throws RequestPreparerError
      */
-    public function createSoftMocksRequestPreparer(LoggerInterface $logger, SoftMocksConfig $config): SoftMocksRequestPreparer
-    {
+    public function createSoftMocksRequestPreparer(
+        LoggerInterface $logger,
+        SoftMocksConfig $config,
+    ): SoftMocksRequestPreparer {
         return new SoftMocksRequestPreparer($logger, $config->getSoftMocks()->getInitScript());
     }
 }
