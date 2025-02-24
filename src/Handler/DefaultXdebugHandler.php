@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Mougrim\XdebugProxy\Handler;
 
 use Amp\ByteStream\ClosedException;
-use Amp\Socket\ServerSocket;
-use Generator;
+use Amp\ByteStream\StreamException;
+use Amp\Socket\ResourceSocket;
 use Mougrim\XdebugProxy\Xml\XmlConverter;
 use Mougrim\XdebugProxy\Xml\XmlException;
 use Psr\Log\LoggerInterface;
 use SplObjectStorage;
+
 use function explode;
 use function mb_strlen;
 use function substr_count;
@@ -20,33 +21,30 @@ use function substr_count;
  */
 class DefaultXdebugHandler implements XdebugHandler
 {
-    protected LoggerInterface $logger;
-    protected XmlConverter $xmlConverter;
-    protected IdeHandler $ideHandler;
     /**
-     * @var SplObjectStorage<ServerSocket, string>
+     * @var SplObjectStorage<ResourceSocket, string>
      */
     protected SplObjectStorage $requestBuffers;
 
-    public function __construct(LoggerInterface $logger, XmlConverter $xmlConverter, IdeHandler $ideHandler)
-    {
-        $this->logger = $logger;
-        $this->xmlConverter = $xmlConverter;
-        $this->ideHandler = $ideHandler;
+    public function __construct(
+        protected LoggerInterface $logger,
+        protected XmlConverter $xmlConverter,
+        protected IdeHandler $ideHandler,
+    ) {
         $this->requestBuffers = new SplObjectStorage();
     }
 
-    public function handle(ServerSocket $socket): Generator
+    public function handle(ResourceSocket $socket): void
     {
         $baseContext = [
-            'xdebug' => $socket->getRemoteAddress(),
+            'xdebug' => $socket->getRemoteAddress()->toString(),
         ];
         $this->logger->notice('[Xdebug] Accepted connection', $baseContext);
 
         if (!$this->requestBuffers->contains($socket)) {
             $this->requestBuffers->attach($socket, '');
         }
-        while (($data = yield $socket->read()) !== null) {
+        while (($data = $socket->read()) !== null) {
             $buffer = $this->requestBuffers->offsetGet($socket);
             $buffer .= $data;
             while (substr_count($buffer, "\0") >= 2) {
@@ -69,7 +67,7 @@ class DefaultXdebugHandler implements XdebugHandler
                     } catch (XmlException $exception) {
                         throw new FromXdebugProcessError("Can't parse request", $context, $exception);
                     }
-                    yield from $this->ideHandler->processRequest($xmlRequest, $request, $socket);
+                    $this->ideHandler->processRequest($xmlRequest, $request, $socket);
                 } catch (FromXdebugProcessError $exception) {
                     $message = "[Xdebug] {$exception->getMessage()}";
                     if ($exception->getPrevious()) {
@@ -84,12 +82,14 @@ class DefaultXdebugHandler implements XdebugHandler
                     $this->logger->notice($message, $exception->getContext());
                 }
                 if ($exception) {
-                    yield from $this->ideHandler->close($socket);
+                    $this->ideHandler->close($socket);
                     $this->requestBuffers->detach($socket);
                     try {
-                        yield $socket->end();
-                    } /** @noinspection BadExceptionsProcessingInspection */ catch (ClosedException $ignore) {
+                        $socket->end();
+                    } /** @noinspection BadExceptionsProcessingInspection */ catch (ClosedException) {
                         // already closed
+                    } catch (StreamException $exception) {
+                        $this->logger->error("Can't close socket", $context + ['exception' => $exception]);
                     }
 
                     return;
@@ -102,6 +102,6 @@ class DefaultXdebugHandler implements XdebugHandler
             $this->logger->warning("[Xdebug] Part of data wasn't parsed", $baseContext + ['buffer']);
         }
         $this->requestBuffers->detach($socket);
-        yield from $this->ideHandler->close($socket);
+        $this->ideHandler->close($socket);
     }
 }

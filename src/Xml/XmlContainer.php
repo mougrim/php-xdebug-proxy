@@ -6,10 +6,13 @@ namespace Mougrim\XdebugProxy\Xml;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
+ *
+ * Actually XmlContainerArray is recursive, but phpstan doesn't support recursive types
+ *
+ * @phpstan-type XmlContainerArray array{name: string, attributes: array<string, string>, content: string, isContentCdata: bool, children: array{string, mixed}}
  */
 class XmlContainer
 {
-    protected string $name;
     /** @var array<string, string> */
     protected array $attributes = [];
     protected string $content = '';
@@ -17,9 +20,9 @@ class XmlContainer
     /** @var XmlContainer[] */
     protected array $children = [];
 
-    public function __construct(string $name)
-    {
-        $this->name = $name;
+    public function __construct(
+        protected readonly string $name,
+    ) {
     }
 
     public function getName(): string
@@ -40,10 +43,7 @@ class XmlContainer
         return $this->attributes;
     }
 
-    /**
-     * @return $this
-     */
-    public function addAttribute(string $name, string $value): XmlContainer
+    public function addAttribute(string $name, string $value): static
     {
         $this->attributes[$name] = $value;
 
@@ -52,10 +52,8 @@ class XmlContainer
 
     /**
      * @param array<string, string> $attributes
-     *
-     * @return $this
      */
-    public function setAttributes(array $attributes): XmlContainer
+    public function setAttributes(array $attributes): static
     {
         $this->attributes = $attributes;
 
@@ -67,10 +65,7 @@ class XmlContainer
         return $this->content;
     }
 
-    /**
-     * @return $this
-     */
-    public function setContent(string $content): XmlContainer
+    public function setContent(string $content): static
     {
         $this->content = $content;
 
@@ -82,10 +77,7 @@ class XmlContainer
         return $this->isContentCdata;
     }
 
-    /**
-     * @return $this
-     */
-    public function setIsContentCdata(bool $isContentCdata): XmlContainer
+    public function setIsContentCdata(bool $isContentCdata): static
     {
         $this->isContentCdata = $isContentCdata;
 
@@ -100,10 +92,7 @@ class XmlContainer
         return $this->children;
     }
 
-    /**
-     * @return $this
-     */
-    public function addChild(XmlContainer $child): XmlContainer
+    public function addChild(XmlContainer $child): static
     {
         $this->children[] = $child;
 
@@ -112,16 +101,17 @@ class XmlContainer
 
     /**
      * @param XmlContainer[] $children
-     *
-     * @return $this
      */
-    public function setChildren(array $children): XmlContainer
+    public function setChildren(array $children): static
     {
         $this->children = $children;
 
         return $this;
     }
 
+    /**
+     * @phpstan-return XmlContainerArray
+     */
     public function toArray(): array
     {
         $children = [];
@@ -129,6 +119,7 @@ class XmlContainer
             $children[] = $child->toArray();
         }
 
+        /** @phpstan-ignore return.type */
         return [
             'name' => $this->name,
             'attributes' => $this->attributes,

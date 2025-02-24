@@ -17,11 +17,14 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
+ *
+ * @phpstan-import-type XdebugProxyConfigArray from Config
  */
 interface Factory
 {
     /**
-     * @param array<array-key, array> $config
+     * @param array<string, array<string, mixed>> $config
+     * @phpstan-param XdebugProxyConfigArray $config
      */
     public function createConfig(array $config): Config;
 
@@ -34,7 +37,7 @@ interface Factory
         LoggerInterface $logger,
         IdeServerConfig $config,
         XmlConverter $xmlConverter,
-        array $requestPreparers
+        array $requestPreparers,
     ): IdeHandler;
 
     /**
@@ -42,17 +45,17 @@ interface Factory
      * - on request to ide from first to last;
      * - on request to xdebug from last to first.
      *
+     * @return RequestPreparer[]
+     *
      * @throws RequestPreparerException
      * @throws RequestPreparerError
-     *
-     * @return RequestPreparer[]
      */
     public function createRequestPreparers(LoggerInterface $logger, Config $config): array;
 
     public function createXdebugHandler(
         LoggerInterface $logger,
         XmlConverter $xmlConverter,
-        IdeHandler $ideHandler
+        IdeHandler $ideHandler,
     ): XdebugHandler;
 
     public function createProxy(
@@ -60,6 +63,6 @@ interface Factory
         Config $config,
         XmlConverter $xmlConverter,
         IdeHandler $ideHandler,
-        XdebugHandler $xdebugHandler
+        XdebugHandler $xdebugHandler,
     ): Proxy;
 }

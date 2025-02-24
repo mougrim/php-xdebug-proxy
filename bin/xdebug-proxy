@@ -1,5 +1,7 @@
 #!/usr/bin/env php
 <?php
+
+declare(strict_types=1);
 /**
  * @author Mougrim <rinat@mougrim.ru>
  */
@@ -27,7 +29,6 @@ if (!$composerInstall) {
     );
     exit(1);
 }
-/** @noinspection PhpIncludeInspection */
 require $composerInstall;
 unset($composerInstall);
 

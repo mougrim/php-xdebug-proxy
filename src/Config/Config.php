@@ -6,17 +6,27 @@ namespace Mougrim\XdebugProxy\Config;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
+ *
+ * @phpstan-import-type ServerConfigArray from Server
+ * @phpstan-import-type ServerDefaultConfigArray from Server
+ * @phpstan-import-type IdeServerConfigArray from IdeServer
+ * @phpstan-import-type IdeServerDefaultConfigArray from IdeServer
+ *
+ * @phpstan-type XdebugProxyConfigArray array{xdebugServer?: ServerConfigArray, ideRegistrationServer?: ServerConfigArray, ideServer?: IdeServerConfigArray}
  */
 class Config
 {
+    /** @var ServerDefaultConfigArray */
     public const DEFAULT_XDEBUG_SERVER_CONFIG = [
         'listen' => '127.0.0.1:9002',
     ];
 
+    /** @var ServerDefaultConfigArray */
     public const DEFAULT_IDE_REGISTRATION_SERVER_CONFIG = [
         'listen' => '127.0.0.1:9001',
     ];
 
+    /** @var IdeServerDefaultConfigArray */
     public const DEFAULT_IDE_SERVER_CONFIG = [
         'defaultIde' => '127.0.0.1:9000',
         'predefinedIdeList' => [
@@ -24,30 +34,25 @@ class Config
         ],
     ];
 
-    /** @var array<array-key, array> */
-    protected array $config;
-    protected Server $xdebugServer;
-    protected Server $ideRegistrationServer;
-    protected IdeServer $ideServer;
+    protected readonly Server $xdebugServer;
+    protected readonly Server $ideRegistrationServer;
+    protected readonly IdeServer $ideServer;
 
     /**
-     * @param array<array-key, array> $config
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedArgumentTypeCoercion
+     * @param XdebugProxyConfigArray $config
      */
     public function __construct(array $config)
     {
-        $this->config = $config;
         $this->xdebugServer = new Server(
-            $this->config['xdebugServer'] ?? [],
+            $config['xdebugServer'] ?? [],
             static::DEFAULT_XDEBUG_SERVER_CONFIG
         );
         $this->ideRegistrationServer = new Server(
-            $this->config['ideRegistrationServer'] ?? [],
+            $config['ideRegistrationServer'] ?? [],
             static::DEFAULT_IDE_REGISTRATION_SERVER_CONFIG
         );
         $this->ideServer = new IdeServer(
-            $this->config['ideServer'] ?? [],
+            $config['ideServer'] ?? [],
             static::DEFAULT_IDE_SERVER_CONFIG
         );
     }

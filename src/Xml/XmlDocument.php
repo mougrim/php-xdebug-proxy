@@ -6,18 +6,16 @@ namespace Mougrim\XdebugProxy\Xml;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
+ *
+ * @phpstan-import-type XmlContainerArray from XmlContainer
  */
 class XmlDocument
 {
-    protected $version;
-    protected $encoding;
-    /** @var XmlContainer|null */
-    protected $root;
-
-    public function __construct(string $version, ?string $encoding = null)
-    {
-        $this->version = $version;
-        $this->encoding = $encoding;
+    public function __construct(
+        protected readonly string $version,
+        protected readonly ?string $encoding = null,
+        protected readonly ?XmlContainer $root = null,
+    ) {
     }
 
     public function getVersion(): string
@@ -36,21 +34,14 @@ class XmlDocument
     }
 
     /**
-     * @return $this
+     * @return array{version: string, encoding: ?string, root: ?XmlContainerArray}
      */
-    public function setRoot(XmlContainer $root): XmlDocument
-    {
-        $this->root = $root;
-
-        return $this;
-    }
-
     public function toArray(): array
     {
         return [
             'version' => $this->version,
             'encoding' => $this->encoding,
-            'root' => $this->root ? $this->root->toArray() : null,
+            'root' => $this->root?->toArray(),
         ];
     }
 }

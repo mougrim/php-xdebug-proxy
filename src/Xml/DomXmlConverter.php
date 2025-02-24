@@ -1,8 +1,8 @@
 <?php
 
-declare(strict_types=1);
+/** @noinspection PhpComposerExtensionStubsInspection */
 
-/** @noinspection PhpComposerExtensionStubsInspection ext-dom is declared as suggest */
+declare(strict_types=1);
 
 namespace Mougrim\XdebugProxy\Xml;
 
@@ -15,6 +15,7 @@ use DOMNode;
 use DOMText;
 use DOMXPath;
 use Psr\Log\LoggerInterface;
+
 use const E_COMPILE_ERROR;
 use const E_COMPILE_WARNING;
 use const E_CORE_ERROR;
@@ -31,59 +32,41 @@ use const E_USER_NOTICE;
 use const E_USER_WARNING;
 use const E_WARNING;
 use const LIBXML_NONET;
+
 use function count;
 use function error_clear_last;
 use function error_get_last;
-use function libxml_disable_entity_loader;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
  */
 class DomXmlConverter implements XmlConverter
 {
-    protected $logger;
-
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        protected readonly LoggerInterface $logger,
+    ) {
     }
 
     protected function getError(int $type): string
     {
-        switch ($type) {
-            case E_ERROR: // 1
-                return 'E_ERROR';
-            case E_WARNING: // 2
-                return 'E_WARNING';
-            case E_PARSE: // 4
-                return 'E_PARSE';
-            case E_NOTICE: // 8
-                return 'E_NOTICE';
-            case E_CORE_ERROR: // 16
-                return 'E_CORE_ERROR';
-            case E_CORE_WARNING: // 32
-                return 'E_CORE_WARNING';
-            case E_COMPILE_ERROR: // 64
-                return 'E_COMPILE_ERROR';
-            case E_COMPILE_WARNING: // 128
-                return 'E_COMPILE_WARNING';
-            case E_USER_ERROR: // 256
-                return 'E_USER_ERROR';
-            case E_USER_WARNING: // 512
-                return 'E_USER_WARNING';
-            case E_USER_NOTICE: // 1024
-                return 'E_USER_NOTICE';
-            case E_STRICT: // 2048
-                return 'E_STRICT';
-            case E_RECOVERABLE_ERROR: // 4096
-                return 'E_RECOVERABLE_ERROR';
-            case E_DEPRECATED: // 8192
-                return 'E_DEPRECATED';
-            case E_USER_DEPRECATED: // 16384
-                return 'E_USER_DEPRECATED';
-            default:
-                return "[{$type}] Unknown";
-        }
+        return match ($type) {
+            E_ERROR => 'E_ERROR',
+            E_WARNING => 'E_WARNING',
+            E_PARSE => 'E_PARSE',
+            E_NOTICE => 'E_NOTICE',
+            E_CORE_ERROR => 'E_CORE_ERROR',
+            E_CORE_WARNING => 'E_CORE_WARNING',
+            E_COMPILE_ERROR => 'E_COMPILE_ERROR',
+            E_COMPILE_WARNING => 'E_COMPILE_WARNING',
+            E_USER_ERROR => 'E_USER_ERROR',
+            E_USER_WARNING => 'E_USER_WARNING',
+            E_USER_NOTICE => 'E_USER_NOTICE',
+            E_STRICT => 'E_STRICT',
+            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
+            E_DEPRECATED => 'E_DEPRECATED',
+            E_USER_DEPRECATED => 'E_USER_DEPRECATED',
+            default => "[{$type}] Unknown",
+        };
     }
 
     /**
@@ -95,15 +78,7 @@ class DomXmlConverter implements XmlConverter
             throw new XmlParseException("Can't parse xml: xml must not be empty");
         }
         $domDocument = new DOMDocument();
-        if (\PHP_VERSION_ID < 80000) {
-            $oldDisableValue = libxml_disable_entity_loader();
-            /** @psalm-suppress ArgumentTypeCoercion */
-            $result = @$domDocument->loadXML($xml, LIBXML_NONET);
-            libxml_disable_entity_loader($oldDisableValue);
-        } else {
-            /** @psalm-suppress ArgumentTypeCoercion */
-            $result = @$domDocument->loadXML($xml, LIBXML_NONET);
-        }
+        $result = @$domDocument->loadXML($xml, LIBXML_NONET);
         if (!$result) {
             $error = error_get_last();
             error_clear_last();
@@ -122,17 +97,16 @@ class DomXmlConverter implements XmlConverter
      */
     protected function toDocument(DOMDocument $domDocument): XmlDocument
     {
-        $document = new XmlDocument($domDocument->xmlVersion, $domDocument->xmlEncoding);
-
         if (count($domDocument->childNodes) > 1) {
             throw new XmlParseException('Too many child nodes in document');
         }
 
+        $root = null;
         if ($domDocument->documentElement) {
-            $document->setRoot($this->toContainer($domDocument, $domDocument->documentElement));
+            $root = $this->toContainer($domDocument, $domDocument->documentElement);
         }
 
-        return $document;
+        return new XmlDocument($domDocument->xmlVersion ?? '', $domDocument->xmlEncoding, $root);
     }
 
     /**
@@ -189,12 +163,28 @@ class DomXmlConverter implements XmlConverter
                 $domDocument->appendChild($domElement);
             }
 
-            return $domDocument->saveXML();
-        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (DOMException $exception) {
+            $xml = @$domDocument->saveXML();
+
+            if ($xml === false) {
+                $error = error_get_last();
+                error_clear_last();
+                $message = '';
+                if ($error) {
+                    $message = ": [{$this->getError($error['type'])}] {$error['message']} in {$error['file']}:{$error['line']}";
+                }
+
+                throw new XmlValidateException("Can't generate xml{$message}");
+            }
+
+            return $xml;
+        } catch (DOMException $exception) {
             throw new XmlValidateException("Can't generate xml", 0, $exception);
         }
     }
 
+    /**
+     * @throws DOMException
+     */
     protected function toDomElement(DOMDocument $domDocument, XmlContainer $container): DOMElement
     {
         $domElement = $domDocument->createElement($container->getName());
@@ -204,7 +194,9 @@ class DomXmlConverter implements XmlConverter
             } else {
                 $domContent = $domDocument->createTextNode($container->getContent());
             }
-            $domElement->appendChild($domContent);
+            if ($domContent) {
+                $domElement->appendChild($domContent);
+            }
         }
         foreach ($container->getAttributes() as $name => $value) {
             $domElement->setAttribute($name, $value);

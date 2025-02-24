@@ -3,9 +3,9 @@ name: Check coding standards
 on: [push, pull_request]
 
 jobs:
-  psalm:
+  php-cs-fixer:
     name: Check coding standards
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -15,7 +15,7 @@ jobs:
         with:
           coverage: "none"
           ini-values: memory_limit=-1,apc.enable_cli=1,zend.assertions=1
-          php-version: "7.4"
+          php-version: "8.1"
           tools: flex
 
       - name: Install dependencies

@@ -1,0 +1,9 @@
+parameters:
+    tmpDir: tmp
+    level: 10
+    paths:
+        - bin
+        - config
+        - softMocksConfig
+        - src
+        - tests

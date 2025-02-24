@@ -5,13 +5,15 @@ declare(strict_types=1);
  * @author Mougrim <rinat@mougrim.ru>
  */
 
-namespace Mougrim\XdebugProxy;
+namespace Mougrim\XdebugProxy\config;
 
-use Amp\ByteStream\ResourceOutputStream;
 use Amp\Log\StreamHandler;
 use Monolog\Logger;
+use Mougrim\XdebugProxy\LoggerFormatter;
+use Mougrim\XdebugProxy\RunError;
 use Psr\Log\LogLevel;
-use const STDOUT;
+
+use function Amp\ByteStream\getStdout;
 use function class_exists;
 
 if (!class_exists(StreamHandler::class)) {
@@ -22,6 +24,6 @@ if (!class_exists(StreamHandler::class)) {
 
 return (new Logger('xdebug-proxy'))
     ->pushHandler(
-        (new StreamHandler(new ResourceOutputStream(STDOUT), LogLevel::NOTICE))
+        (new StreamHandler(getStdout(), LogLevel::NOTICE))
             ->setFormatter(new LoggerFormatter())
     );

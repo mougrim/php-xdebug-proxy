@@ -4,66 +4,73 @@ declare(strict_types=1);
 
 namespace Mougrim\XdebugProxy;
 
-use Amp\Loop;
+use Amp\Socket\ResourceServerSocket;
 use Amp\Socket\SocketException;
-use Generator;
 use Mougrim\XdebugProxy\Config\Config;
 use Mougrim\XdebugProxy\Handler\IdeHandler;
 use Mougrim\XdebugProxy\Handler\XdebugHandler;
 use Mougrim\XdebugProxy\Xml\XmlConverter;
 use Psr\Log\LoggerInterface;
-use function Amp\asyncCoroutine;
+use Revolt\EventLoop;
+use Revolt\EventLoop\UnsupportedFeatureException;
+
+use const SIGINT;
+use const SIGTERM;
+
+use function Amp\async;
 use function Amp\Socket\listen;
+use function extension_loaded;
 
 /**
  * @author Mougrim <rinat@mougrim.ru>
  */
 class Proxy
 {
-    protected $logger;
-    protected $config;
-    protected $xmlConverter;
-    protected $ideHandler;
-    protected $xdebugHandler;
+    /** @var ResourceServerSocket[] */
+    protected array $servers = [];
 
     public function __construct(
-        LoggerInterface $logger,
-        Config $config,
-        XmlConverter $xmlConverter,
-        IdeHandler $ideHandler,
-        XdebugHandler $xdebugHandler
+        protected readonly LoggerInterface $logger,
+        protected readonly Config $config,
+        protected readonly XmlConverter $xmlConverter,
+        protected readonly IdeHandler $ideHandler,
+        protected readonly XdebugHandler $xdebugHandler,
     ) {
-        $this->logger = $logger;
-        $this->config = $config;
-        $this->xmlConverter = $xmlConverter;
-        $this->ideHandler = $ideHandler;
-        $this->xdebugHandler = $xdebugHandler;
     }
 
+    /**
+     * @throws UnsupportedFeatureException
+     */
     public function run(): void
     {
-        Loop::defer([$this, 'runIdeRegistration']);
-        Loop::defer([$this, 'runXdebug']);
-        Loop::run();
+        if (extension_loaded('pcntl')) {
+            $terminateClosure = fn (string $callbackId, int $signal) => $this->terminate();
+            EventLoop::onSignal(SIGTERM, $terminateClosure);
+            EventLoop::onSignal(SIGINT, $terminateClosure);
+        }
+
+        async(fn () => $this->runIdeRegistration());
+        async(fn () => $this->runXdebug());
+        EventLoop::run();
     }
 
     /**
      * @throws SocketException
      */
-    public function runXdebug(): Generator
+    public function runXdebug(): void
     {
-        $xdebugHandler = asyncCoroutine([$this->xdebugHandler, 'handle']);
         $server = listen($this->config->getXdebugServer()->getListen());
-        $this->logger->notice("[Proxy][Xdebug] Listening for new connections on '{$server->getAddress()}'...");
-        while ($socket = yield $server->accept()) {
-            $xdebugHandler($socket);
+        $this->servers[] = $server;
+        $this->logger->notice("[Proxy][Xdebug] Listening for new connections on '{$server->getAddress()->toString()}'...");
+        while ($client = $server->accept()) {
+            async(fn () => $this->xdebugHandler->handle($client));
         }
     }
 
     /**
      * @throws SocketException
      */
-    public function runIdeRegistration(): Generator
+    public function runIdeRegistration(): void
     {
         $listen = $this->config->getIdeRegistrationServer()->getListen();
         if (!$listen) {
@@ -71,13 +78,23 @@ class Proxy
 
             return;
         }
-        $ideHandler = asyncCoroutine([$this->ideHandler, 'handle']);
         $server = listen($listen);
+        $this->servers[] = $server;
         $this->logger->notice(
-            "[Proxy][IdeRegistration] Listening for new connections on '{$server->getAddress()}'..."
+            "[Proxy][IdeRegistration] Listening for new connections on '{$server->getAddress()->toString()}'..."
         );
-        while ($socket = yield $server->accept()) {
-            $ideHandler($socket);
+        while ($socket = $server->accept()) {
+            async(fn () => $this->ideHandler->handle($socket));
         }
+    }
+
+    public function terminate(): void
+    {
+        foreach ($this->servers as $server) {
+            $server->close();
+        }
+        $this->logger->notice('[Proxy][Terminating] Terminating proxy server.');
+        EventLoop::getDriver()->stop();
+        $this->servers = [];
     }
 }

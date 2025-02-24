@@ -13,8 +13,10 @@ use Mougrim\XdebugProxy\Xml\XmlParseException;
 use Mougrim\XdebugProxy\Xml\XmlValidateException;
 use Psr\Log\LoggerInterface;
 use Tests\Mougrim\XdebugProxy\TestCase;
+
 use const ENT_QUOTES;
 use const ENT_XML1;
+
 use function htmlspecialchars;
 
 /**
@@ -122,7 +124,7 @@ class DomXmlConverterTest extends TestCase
         static::assertSame('1.0', $document->getVersion());
         static::assertSame('UTF-8', $document->getEncoding());
         $root = $document->getRoot();
-        static::assertSame('root', $root->getName());
+        static::assertSame('root', $root?->getName());
         static::assertFalse($root->isContentCdata(), "Content shouldn't be cdata");
         static::assertSame('</root><root>xss', $root->getContent());
         static::assertSame(['attribute' => '">xss</root><root>'], $root->getAttributes());
@@ -168,8 +170,7 @@ class DomXmlConverterTest extends TestCase
     public function testNameValidate(): void
     {
         $root = new XmlContainer(htmlspecialchars('<rootattribute="value">', ENT_XML1 | ENT_QUOTES));
-        $document = (new XmlDocument('1.0', 'UTF-8'))
-            ->setRoot($root);
+        $document = new XmlDocument('1.0', 'UTF-8', $root);
         $converter = new DomXmlConverter($this->createFakeLogger());
         $this->expectException(XmlValidateException::class);
         $this->expectExceptionMessage("Can't generate xml");
@@ -183,8 +184,7 @@ class DomXmlConverterTest extends TestCase
                 htmlspecialchars('>XSS</root><root attribute="', ENT_XML1 | ENT_QUOTES),
                 'value'
             );
-        $document = (new XmlDocument('1.0', 'UTF-8'))
-            ->setRoot($root);
+        $document = new XmlDocument('1.0', 'UTF-8', $root);
         $converter = new DomXmlConverter($this->createFakeLogger());
         $this->expectException(XmlValidateException::class);
         $this->expectExceptionMessage("Can't generate xml");
