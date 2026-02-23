@@ -36,7 +36,7 @@ class DomXmlConverterTest extends TestCase
         static::assertSame('UTF-8', $document->getEncoding());
         $root = $document->getRoot();
         static::assertNotEmpty($root);
-        static::assertSame('root', $root->getName());
+        static::assertSame('root', $root?->getName());
         static::assertFalse($root->isContentCdata(), "Content shouldn't be cdata");
         static::assertEmpty($root->getContent(), "Content: {$root->getContent()}");
         static::assertEmpty($root->getAttributes());
@@ -226,7 +226,7 @@ class DomXmlConverterTest extends TestCase
         $root = $document->getRoot();
 
         static::assertNotEmpty($root);
-        static::assertSame('init', $root->getName());
+        static::assertSame('init', $root?->getName());
         static::assertFalse($root->isContentCdata(), "Content shouldn't be cdata");
         static::assertEmpty($root->getContent(), "Content: {$root->getContent()}");
         static::assertSame(
@@ -346,7 +346,7 @@ class DomXmlConverterTest extends TestCase
         $root = $document->getRoot();
 
         static::assertNotEmpty($root);
-        static::assertSame('response', $root->getName());
+        static::assertSame('response', $root?->getName());
         static::assertFalse($root->isContentCdata(), "Content shouldn't be cdata");
         static::assertEmpty($root->getContent(), "Content: {$root->getContent()}");
         static::assertSame(

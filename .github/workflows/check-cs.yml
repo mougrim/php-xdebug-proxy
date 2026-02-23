@@ -15,7 +15,7 @@ jobs:
         with:
           coverage: "none"
           ini-values: memory_limit=-1,apc.enable_cli=1,zend.assertions=1
-          php-version: "8.1"
+          php-version: "8.2"
           tools: flex
 
       - name: Install dependencies

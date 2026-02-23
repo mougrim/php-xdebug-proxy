@@ -1,26 +1,23 @@
+<?xml version="1.0"?>
 <phpunit bootstrap="tests/bootstrap.php"
          backupGlobals="false"
-         backupStaticAttributes="false"
-         cacheTokens="false"
-         verbose="true"
          colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
          stopOnError="false"
          stopOnFailure="false"
          stopOnIncomplete="false"
          processIsolation="false"
          stopOnSkipped="false"
+         cacheDirectory=".phpunit.cache"
+         backupStaticProperties="false"
 >
     <testsuites>
         <testsuite name="Main">
             <directory>tests/Unit</directory>
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
+    <source>
+        <include>
             <directory suffix=".php">src</directory>
-        </whitelist>
-    </filter>
+        </include>
+    </source>
 </phpunit>

@@ -3,6 +3,7 @@
 ### [Unreleased]
 
 There are next changes:
+- Update minimum php version from 8.1 to 8.2
 
 ### [v0.6.0]
 
